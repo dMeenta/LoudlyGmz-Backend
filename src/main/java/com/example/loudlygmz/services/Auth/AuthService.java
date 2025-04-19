@@ -1,5 +1,7 @@
 package com.example.loudlygmz.services.Auth;
 
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,7 @@ public class AuthService implements IAuthService {
     @Override
     public ResponseEntity<?> login(LoginRequest request) {
         try {
-            String response = firebaseAuthClient.signInWithEmailAndPassword(request.getEmail(), request.getPassword());
+            Map<String, String> response = firebaseAuthClient.signInWithEmailAndPassword(request.getEmail(), request.getPassword());
             return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Autenticación exitosa", response));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -33,7 +35,7 @@ public class AuthService implements IAuthService {
     @Override
     public ResponseEntity<?> register(RegisterRequest request) {
         try {
-            String response = firebaseAuthClient.signUpWithEmailAndPassword(request.getEmail(), request.getPassword());
+            Map<String, String> response = firebaseAuthClient.signUpWithEmailAndPassword(request.getEmail(), request.getPassword());
             return ResponseEntity.ok(ApiResponse.success(HttpStatus.CREATED.value(), "Usuario Registrado Correctamente", response));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -55,4 +57,19 @@ public class AuthService implements IAuthService {
                 );
         }
     }
+
+    @Override
+    public ResponseEntity<?> logout(String uid) {
+        try {
+            firebaseAuthClient.revokeUserTokens(uid);
+            return ResponseEntity.ok(
+                ApiResponse.success(HttpStatus.OK.value(), "Sesión cerrada exitosamente", null)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error al cerrar sesión", e.getMessage()));
+        }
+    }
+
+    
 }

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.loudlygmz.entity.AuthRequests.*;
 import com.example.loudlygmz.services.Auth.IAuthService;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,5 +35,11 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         return authService.resetPassword(request);
+    }
+    
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody Map<String, String> body) {
+        String uid = body.get("uid");
+        return authService.logout(uid);
     }
 }

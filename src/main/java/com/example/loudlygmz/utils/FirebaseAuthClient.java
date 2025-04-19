@@ -2,6 +2,8 @@ package com.example.loudlygmz.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,7 @@ public class FirebaseAuthClient {
     private String firebaseApiKey;
 
     // Método para iniciar sesión
-    public String signInWithEmailAndPassword(String email, String password) throws IOException {
+    public Map<String, String> signInWithEmailAndPassword(String email, String password) throws IOException {
         Map<String, Object> payload = Map.of(
             "email", email,
             "password", password,
@@ -30,7 +32,7 @@ public class FirebaseAuthClient {
     }
 
     // Método para registrar un nuevo usuario
-    public String signUpWithEmailAndPassword(String email, String password) throws IOException {
+    public Map<String, String> signUpWithEmailAndPassword(String email, String password) throws IOException {
         Map<String, Object> payload = Map.of(
             "email", email,
             "password", password,
@@ -48,7 +50,11 @@ public class FirebaseAuthClient {
         sendFirebaseAuthRequest("sendOobCode", payload);
     }
 
-    private String sendFirebaseAuthRequest(String endpoint, Map<String, Object> payload) throws IOException {
+    public void revokeUserTokens(String uid) throws FirebaseAuthException{
+        FirebaseAuth.getInstance().revokeRefreshTokens(uid);;
+    }
+
+    private Map<String, String> sendFirebaseAuthRequest(String endpoint, Map<String, Object> payload) throws IOException {
         String url = "https://identitytoolkit.googleapis.com/v1/accounts:" + endpoint + "?key=" + firebaseApiKey;
         
         ObjectMapper mapper = new ObjectMapper();
@@ -68,7 +74,16 @@ public class FirebaseAuthClient {
             }
 
             JsonNode responseJson = mapper.readTree(response.body());
-            return responseJson.toString();
+            
+            // Parsear la respuesta JSON
+            String email = responseJson.get("email").asText();
+            String localId = responseJson.get("localId").asText();
+ 
+            // Devolver los datos requeridos en un mapa
+            return Map.of(
+                "email", email,
+                "localId", localId
+            );
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("La solicitud fue interrumpida", e);

@@ -8,4 +8,5 @@ public interface IAuthService {
     ResponseEntity<?> login(AuthRequests.LoginRequest request);
     ResponseEntity<?> register(AuthRequests.RegisterRequest request);
     ResponseEntity<?> resetPassword(AuthRequests.ResetPasswordRequest request);
+    ResponseEntity<?> logout(String uid);
 }
