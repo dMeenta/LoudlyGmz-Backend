@@ -1,0 +1,78 @@
+package com.example.loudlygmz.utils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.io.*;
+import java.net.URI;
+import java.util.Map;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+@Component
+public class FirebaseAuthClient {
+
+    @Value("${firebase.api.key}")
+    private String firebaseApiKey;
+
+    // Método para iniciar sesión
+    public String signInWithEmailAndPassword(String email, String password) throws IOException {
+        Map<String, Object> payload = Map.of(
+            "email", email,
+            "password", password,
+            "returnSecureToken", true
+        );
+        return sendFirebaseAuthRequest("signInWithPassword", payload);
+    }
+
+    // Método para registrar un nuevo usuario
+    public String signUpWithEmailAndPassword(String email, String password) throws IOException {
+        Map<String, Object> payload = Map.of(
+            "email", email,
+            "password", password,
+            "returnSecureToken", true
+        );
+        return sendFirebaseAuthRequest("signUp", payload);
+    }
+
+    // Método para restablecer la contraseña
+    public void sendPasswordResetEmail(String email) throws IOException {
+        Map<String, Object> payload = Map.of(
+            "requestType", "PASSWORD_RESET",
+            "email", email
+        );
+        sendFirebaseAuthRequest("sendOobCode", payload);
+    }
+
+    private String sendFirebaseAuthRequest(String endpoint, Map<String, Object> payload) throws IOException {
+        String url = "https://identitytoolkit.googleapis.com/v1/accounts:" + endpoint + "?key=" + firebaseApiKey;
+        
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonPayload = mapper.writeValueAsString(payload);
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                .build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Error al autenticar: " + response.body());
+            }
+
+            JsonNode responseJson = mapper.readTree(response.body());
+            return responseJson.toString();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("La solicitud fue interrumpida", e);
+        }
+    }
+}
+
