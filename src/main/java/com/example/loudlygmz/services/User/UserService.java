@@ -3,6 +3,7 @@ package com.example.loudlygmz.services.User;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,11 +29,18 @@ public class UserService implements IUserService{
             return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.success(HttpStatus.CREATED.value(), "Usuario creado exitosamente", response));
 
-        } catch (Exception e) {
+        } catch (DataIntegrityViolationException e) {
 
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ApiResponse.error(
+                HttpStatus.BAD_REQUEST.value(),
+                "El correo ya está en uso",
+                null
+            ));
+            
+        } catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error al registrar usuario", null));
-            
         }
     }
 
