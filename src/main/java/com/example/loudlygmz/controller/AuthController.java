@@ -9,6 +9,8 @@ import com.example.loudlygmz.services.Auth.IAuthService;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -41,5 +43,10 @@ public class AuthController {
     public ResponseEntity<?> logout(@RequestBody Map<String, String> body) {
         String uid = body.get("uid");
         return authService.logout(uid);
+    }
+
+    @DeleteMapping("/{uid}")
+    public ResponseEntity<?> deleteUserFromFirebase(@PathVariable String uid){
+        return authService.deleteUser(uid);
     }
 }

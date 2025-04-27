@@ -71,5 +71,14 @@ public class AuthService implements IAuthService {
         }
     }
 
-    
+    @Override
+    public ResponseEntity<?> deleteUser(String uid) {
+        try {
+            firebaseAuthClient.deleteUser(uid);
+            return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Usuario eliminado de firebase correctamente", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error interno", e.getMessage()));
+        }
+    }
 }

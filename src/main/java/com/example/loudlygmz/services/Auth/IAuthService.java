@@ -9,4 +9,5 @@ public interface IAuthService {
     ResponseEntity<?> register(AuthRequests.RegisterRequest request);
     ResponseEntity<?> resetPassword(AuthRequests.ResetPasswordRequest request);
     ResponseEntity<?> logout(String uid);
+    ResponseEntity<?> deleteUser(String uid);
 }

@@ -50,6 +50,10 @@ public class FirebaseAuthClient {
         sendFirebaseAuthRequest("sendOobCode", payload);
     }
 
+    public void deleteUser(String uid) throws Exception{
+        FirebaseAuth.getInstance().deleteUser(uid);
+    }
+
     public void revokeUserTokens(String uid) throws FirebaseAuthException{
         FirebaseAuth.getInstance().revokeRefreshTokens(uid);;
     }
