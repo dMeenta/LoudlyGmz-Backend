@@ -2,6 +2,7 @@ package com.example.loudlygmz.services.Auth;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,8 @@ import com.example.loudlygmz.utils.FirebaseAuthClient;
 @Service
 public class AuthService implements IAuthService {
 
-    private final FirebaseAuthClient firebaseAuthClient;
+    @Autowired
+    FirebaseAuthClient firebaseAuthClient;
 
     public AuthService(FirebaseAuthClient firebaseAuthClient) {
         this.firebaseAuthClient = firebaseAuthClient;

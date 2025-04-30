@@ -23,7 +23,7 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     
-    private String name, description, release_date, developer;
+    private String name, description, release_date, developer, game_wallpaper, game_minicard;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "games_categories", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
