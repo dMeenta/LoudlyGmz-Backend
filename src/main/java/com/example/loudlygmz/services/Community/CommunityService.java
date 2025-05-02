@@ -45,4 +45,16 @@ public class CommunityService implements ICommunityService {
         }
     }
     
+    @Override
+    public ResponseEntity<?> checkMembership(String userId, Integer gameId){
+        try {
+            if (userId == null || gameId == null) {
+                return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Parámetros inválidos", "userId y/o gameId no pueden ser nulos"));
+            }
+            boolean response = communityDAO.checkMembership(userId, gameId);
+            return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Verificación de miembro de la comunidad", response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Hubo un error al verificar el miembro de la comunidad", e.getMessage()));
+        }
+    }
 }

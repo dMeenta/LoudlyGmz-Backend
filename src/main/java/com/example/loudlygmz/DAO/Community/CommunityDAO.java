@@ -86,4 +86,22 @@ public class CommunityDAO implements ICommunityDAO {
             return false;
         }
     }
+
+    @Override
+    public boolean checkMembership(String userId, Integer gameId) {
+        try {
+            DocumentReference membRef = firestore
+            .collection("communities")
+            .document(gameId.toString())
+            .collection("members")
+            .document(userId);
+
+            DocumentSnapshot snapshot = membRef.get().get();
+            return snapshot.exists();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
 }
