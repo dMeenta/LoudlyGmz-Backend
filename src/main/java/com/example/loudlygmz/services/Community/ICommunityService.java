@@ -6,4 +6,5 @@ import com.example.loudlygmz.entity.CommunityRequests;
 
 public interface ICommunityService {
     public ResponseEntity<?> joinCommunity(CommunityRequests request);
+    public ResponseEntity<?> leaveCommunity(CommunityRequests request);
 }

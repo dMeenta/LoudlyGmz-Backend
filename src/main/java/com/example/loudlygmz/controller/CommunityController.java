@@ -8,16 +8,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.loudlygmz.entity.CommunityRequests;
-import com.example.loudlygmz.services.Community.CommunityService;
+import com.example.loudlygmz.services.Community.ICommunityService;
 
 @RestController
 @RequestMapping("/community")
 public class CommunityController {
+    
     @Autowired
-    private CommunityService communityService;
+    private ICommunityService communityService;
 
     @PostMapping("/join")
     public ResponseEntity<?> joinCommunity(@RequestBody CommunityRequests request) {
         return communityService.joinCommunity(request);
+    }
+
+    @PostMapping("/leave")
+    public ResponseEntity<?> leaveCommunity(@RequestBody CommunityRequests request) {
+        return communityService.leaveCommunity(request);
     }
 }
