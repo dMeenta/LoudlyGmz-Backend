@@ -27,11 +27,14 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if(categoryDAO.count() > 0){
-            logger.warn("\n ---------------------\nLa tabla {category} ya contiene datos\n---------------------\n");
+        if(categoryDAO.count() > 0 && gameDAO.count() > 0){
+            logger.warn(
+                "\n|======================================================|\n" +
+                "|       SEEDING ABORTADO PORQUE YA EXISTEN DATOS       |\n"+
+                "|======================================================|");
             return;
-        } 
-        
+        }
+
         Category action = new Category("Acción", "Juegos centrados en la habilidad, reflejos y combate rápido, donde la adrenalina y la intensidad son protagonistas.");
         Category adventure = new Category("Aventura", "Experiencias inmersivas que combinan exploración, narrativa y resolución de acertijos en mundos variados.");
         Category role = new Category("Rol", "Juegos donde el jugador asume el papel de un personaje, desarrollando habilidades y tomando decisiones que afectan la historia.");
@@ -41,14 +44,9 @@ public class DatabaseSeeder implements CommandLineRunner {
         Category platform = new Category("Plataformas", "Juegos centrados en saltos, obstáculos y navegación a través de niveles desafiantes y entretenidos.");
         Category moba = new Category("MOBA", "Multiplayer Online Battle Arena: juegos estratégicos donde equipos compiten en mapas con objetivos específicos.");
         Category tacticalShooter = new Category("Tactical Shooter", "Juegos de disparos enfocados en estrategia, trabajo en equipo y una jugabilidad realista y táctica.");
-        
+
         categoryDAO.saveAll(List.of(action, adventure, role, twoD, threeD, metroidvania, platform, moba, tacticalShooter));
-        
-        if (gameDAO.count() > 0){
-            logger.warn("\n ---------------------\nLa tabla {games} ya contiene datos\n---------------------\n");
-            return ;
-        }
-        
+
         Game g1 = new Game("League of Legends", "League of Legends es un juego de estrategia por equipos en el que dos equipos de cinco campeones se enfrentan para ver quién destruye antes la base del otro. Elige de entre un elenco de 140 campeones para realizar jugadas épicas, asesinar rivales y derribar torretas para alzarte con la victoria.","2009-10-27", "Riot Games");
         g1.setCategories(List.of(action, role, moba));
         Game g2 = new Game("Valorant", "Un juego de disparos táctico 5v5 basado en personajes.","2020-06-02", "Riot Games");
