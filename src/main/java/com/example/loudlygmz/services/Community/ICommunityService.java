@@ -8,4 +8,5 @@ public interface ICommunityService {
     public ResponseEntity<?> joinCommunity(CommunityRequests request);
     public ResponseEntity<?> leaveCommunity(CommunityRequests request);
     public ResponseEntity<?> checkMembership(String userId, Integer gameId);
+    public ResponseEntity<?> getCommunitiesByUser(String userId);
 }

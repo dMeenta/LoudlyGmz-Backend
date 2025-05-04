@@ -1,5 +1,7 @@
 package com.example.loudlygmz.services.Community;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,4 +59,19 @@ public class CommunityService implements ICommunityService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Hubo un error al verificar el miembro de la comunidad", e.getMessage()));
         }
     }
+
+    @Override
+    public ResponseEntity<?> getCommunitiesByUser(String userId) {
+        try {
+            if (userId == null) {
+                return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Parámetros inválidos", "userId no puede ser nulo"));
+            }
+            List<?> response = communityDAO.getCommunitiesByUser(userId);
+            return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Lista de comunidades del usuario recuperada", response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Hubo un error al recuperar la lista de comunidades del usuario", e.getMessage()));
+        }
+    }
+
+    
 }

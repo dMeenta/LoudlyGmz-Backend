@@ -32,8 +32,7 @@ public class CommunityDAO implements ICommunityDAO {
             // Verificar si ya es miembro
             DocumentSnapshot memberSnap = memberRef.get().get();
             if (memberSnap.exists()) {
-                System.out.println("El usuario ya está en la comunidad.");
-                return false;
+                throw new RuntimeException("El usuario ya está en la comunidad");
             }
 
             // 1. Añadir al documento de comunidad
@@ -56,8 +55,7 @@ public class CommunityDAO implements ICommunityDAO {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("Error al unirse a la membresía", e);
         }
     }
 
@@ -80,28 +78,46 @@ public class CommunityDAO implements ICommunityDAO {
                 .toList();
                 userRef.update("joinedCommunities", updated);
             }
+
             return true;
+
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("Error al abandonar la comunidad", e);
         }
     }
 
     @Override
     public boolean checkMembership(String userId, Integer gameId) {
         try {
-            DocumentReference membRef = firestore
+            DocumentReference memberRef = firestore
             .collection("communities")
             .document(gameId.toString())
             .collection("members")
             .document(userId);
 
-            DocumentSnapshot snapshot = membRef.get().get();
+            DocumentSnapshot snapshot = memberRef.get().get();
             return snapshot.exists();
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("Error al verificar la membresía", e);
         }
     }
+
+    @Override
+    public List<?> getCommunitiesByUser(String uid) {
+        try {
+            DocumentSnapshot snapshot = firestore
+            .collection("users")
+            .document(uid).get().get();
+
+            if (snapshot.exists() && snapshot.contains("joinedCommunities")) {
+                return (List<Map<String, Object>>) snapshot.get("joinedCommunities");
+            } else {
+                return List.of(); // vacío si no hay comunidades
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error al obtener las comunidades del usuario", e);
+        }
+    }
+    
     
 }

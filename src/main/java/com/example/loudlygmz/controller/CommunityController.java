@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.loudlygmz.entity.CommunityRequests;
 import com.example.loudlygmz.services.Community.ICommunityService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
@@ -33,6 +34,11 @@ public class CommunityController {
     @GetMapping("/isMember")
     public ResponseEntity<?> checkMembership(@RequestParam String userId, @RequestParam Integer gameId) {
         return communityService.checkMembership(userId, gameId);
+    }
+    
+    @GetMapping("/{uid}")
+    public ResponseEntity<?> getCommunitiesByUser(@PathVariable String uid) {
+        return communityService.getCommunitiesByUser(uid);
     }
     
 }
