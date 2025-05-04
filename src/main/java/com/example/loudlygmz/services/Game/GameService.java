@@ -1,5 +1,6 @@
 package com.example.loudlygmz.services.Game;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,4 +75,20 @@ public class GameService implements IGameService {
             );
         }
     }
+
+    @Override
+    public ResponseEntity<?> getUserGames(List<Integer> idList) {
+        try {
+            List<Game> response = new ArrayList<Game>();
+            for (Integer id : idList) {
+                Optional<Game> game = gameDAO.findById(id);
+                game.ifPresent(response::add);
+            }
+            return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Juegos del usuario obtenidos exitosamente", response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error al obtener los juegos del usuario", null));
+        }
+    }
+
+    
 }

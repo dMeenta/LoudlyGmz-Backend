@@ -20,7 +20,7 @@ public class UserService implements IUserService{
     private IUserDAO userDAO;
 
     @Override
-    public ResponseEntity<ApiResponse<User>> createUser(User user) {
+    public ResponseEntity<ApiResponse<?>> createUser(User user) {
         try {
             User sanitized = SanitizationUtils.sanitizeUser(user);
 
@@ -40,7 +40,7 @@ public class UserService implements IUserService{
             
         } catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error al registrar usuario", null));
+            .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error al registrar usuario", e.getMessage()));
         }
     }
 
