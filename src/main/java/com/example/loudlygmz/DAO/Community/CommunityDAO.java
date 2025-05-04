@@ -119,5 +119,4 @@ public class CommunityDAO implements ICommunityDAO {
         }
     }
     
-    
 }
