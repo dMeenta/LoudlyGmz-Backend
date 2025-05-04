@@ -25,6 +25,15 @@ public class Game {
     
     private String name, description, release_date, developer, game_wallpaper, game_minicard;
 
+    public Game(String name, String description, String release_date, String developer) {
+        this.name = name;
+        this.description = description;
+        this.release_date = release_date;
+        this.developer = developer;
+        this.game_wallpaper = "";
+        this.game_minicard = "";
+    }
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "games_categories", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     @JsonManagedReference

@@ -22,6 +22,11 @@ public class Category {
 
     private String name, description;
     
+    public Category(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+    
     @ManyToMany(mappedBy = "categories") // Relación inversa, gestionada por Category
     @JsonBackReference
     private List<Game> games;
