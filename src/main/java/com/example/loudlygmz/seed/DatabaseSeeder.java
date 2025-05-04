@@ -82,6 +82,6 @@ public class DatabaseSeeder implements CommandLineRunner {
         Game g16 = new Game("Final Fantasy XV", "Un juego de rol épico donde el príncipe Noctis y sus amigos intentan recuperar su reino de las fuerzas enemigas.", "2016-11-29", "Square Enix");
         g16.setCategories(List.of(action, role, threeD));
 
-        gameDAO.saveAll(List.of(g1, g2, g3, g4, g5, g6, g7, g8, g9, g10));
+        gameDAO.saveAll(List.of(g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g13, g14, g15, g16));
     }
 }
