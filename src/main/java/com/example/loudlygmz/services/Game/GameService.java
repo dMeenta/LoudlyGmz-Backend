@@ -89,6 +89,4 @@ public class GameService implements IGameService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error al obtener los juegos del usuario", null));
         }
     }
-
-    
 }
