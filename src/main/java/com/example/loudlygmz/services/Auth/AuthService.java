@@ -22,7 +22,7 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public ResponseEntity<?> login(LoginRequest request) {
+    public ResponseEntity<ApiResponse<?>> login(LoginRequest request) {
         try {
             Map<String, String> response = firebaseAuthClient.signInWithEmailAndPassword(request.getEmail(), request.getPassword());
             return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Autenticación exitosa", response));
@@ -35,10 +35,10 @@ public class AuthService implements IAuthService {
     }
     
     @Override
-    public ResponseEntity<?> register(RegisterRequest request) {
+    public ResponseEntity<ApiResponse<?>> register(RegisterRequest request) {
         try {
             Map<String, String> response = firebaseAuthClient.signUpWithEmailAndPassword(request.getEmail(), request.getPassword());
-            return ResponseEntity.ok(ApiResponse.success(HttpStatus.CREATED.value(), "Usuario Registrado Correctamente", response));
+            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(HttpStatus.CREATED.value(), "Usuario Registrado Correctamente", response));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(
@@ -48,7 +48,7 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public ResponseEntity<?> resetPassword(ResetPasswordRequest request) {
+    public ResponseEntity<ApiResponse<?>> resetPassword(ResetPasswordRequest request) {
         try {
             firebaseAuthClient.sendPasswordResetEmail(request.getEmail());;
             return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Correo de reestablecimiento enviado", null));
@@ -61,7 +61,7 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public ResponseEntity<?> logout(String uid) {
+    public ResponseEntity<ApiResponse<?>> logout(String uid) {
         try {
             firebaseAuthClient.revokeUserTokens(uid);
             return ResponseEntity.ok(
@@ -74,7 +74,7 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public ResponseEntity<?> deleteUser(String uid) {
+    public ResponseEntity<ApiResponse<?>> deleteUser(String uid) {
         try {
             firebaseAuthClient.deleteUser(uid);
             return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Usuario eliminado de firebase correctamente", null));
