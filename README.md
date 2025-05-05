@@ -64,7 +64,10 @@ LoudlyGmz-Backend/
 
    ### Cambiar las respectivas variables dependiendo de su sistema
 
-4. **Ejecutar la aplicación:**
+   ![image](https://github.com/user-attachments/assets/0cfc39ff-af09-4fe4-83b7-67df415fa531)
+
+
+5. **Ejecutar la aplicación:**
 
    > ⚠️ **IMPORTANTE:** Tener en cuenta que el proyecto generará automaticamente la base de datos al ser compilado (si encuentra una tabla dentro de la base de datos con información no procederá a generar las semillas)
 
