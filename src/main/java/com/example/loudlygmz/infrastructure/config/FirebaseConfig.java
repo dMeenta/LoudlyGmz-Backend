@@ -1,4 +1,4 @@
-package com.example.loudlygmz.config;
+package com.example.loudlygmz.infrastructure.config;
 
 import java.io.IOException;
 import java.io.InputStream;

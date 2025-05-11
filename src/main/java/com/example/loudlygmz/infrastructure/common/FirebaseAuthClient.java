@@ -1,9 +1,10 @@
-package com.example.loudlygmz.utils;
+package com.example.loudlygmz.infrastructure.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -32,13 +33,17 @@ public class FirebaseAuthClient {
     }
 
     // Método para registrar un nuevo usuario
-    public Map<String, String> signUpWithEmailAndPassword(String email, String password) throws IOException {
-        Map<String, Object> payload = Map.of(
-            "email", email,
-            "password", password,
-            "returnSecureToken", true
-        );
-        return sendFirebaseAuthRequest("signUp", payload);
+    public String createFirebaseUser(String email, String password) {
+        UserRecord.CreateRequest firebaseRequest = new UserRecord.CreateRequest()
+        .setEmail(email)
+        .setPassword(password);
+
+        try {
+            UserRecord record = FirebaseAuth.getInstance().createUser(firebaseRequest);
+            return record.getUid();
+        } catch (FirebaseAuthException e) {
+            throw new RuntimeException("Error creando usuario en Firebase: " + e.getMessage());
+        }
     }
 
     // Método para restablecer la contraseña
@@ -50,8 +55,12 @@ public class FirebaseAuthClient {
         sendFirebaseAuthRequest("sendOobCode", payload);
     }
 
-    public void deleteUser(String uid) throws Exception{
-        FirebaseAuth.getInstance().deleteUser(uid);
+    public void deleteUser(String uid){
+        try {
+            FirebaseAuth.getInstance().deleteUser(uid);
+        } catch (FirebaseAuthException e) {
+            throw new RuntimeException("Error eliminando usuario en Firebase: " + e.getMessage(), e);
+        }
     }
 
     public void revokeUserTokens(String uid) throws FirebaseAuthException{

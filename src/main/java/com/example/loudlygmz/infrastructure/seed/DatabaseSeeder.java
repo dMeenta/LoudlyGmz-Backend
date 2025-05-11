@@ -1,4 +1,4 @@
-package com.example.loudlygmz.seed;
+package com.example.loudlygmz.infrastructure.seed;
 
 import java.util.List;
 
@@ -8,19 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.example.loudlygmz.DAO.ICategoryDAO;
-import com.example.loudlygmz.DAO.IGameDAO;
-import com.example.loudlygmz.entity.Category;
-import com.example.loudlygmz.entity.Game;
+
+import com.example.loudlygmz.domain.model.Category;
+import com.example.loudlygmz.domain.model.Game;
+import com.example.loudlygmz.domain.repository.ICategoryRepository;
+import com.example.loudlygmz.domain.repository.IGameRepository;
 
 @Component
 public class DatabaseSeeder implements CommandLineRunner {
 
     @Autowired
-    private IGameDAO gameDAO;
+    private IGameRepository gameDAO;
 
     @Autowired
-    private ICategoryDAO categoryDAO;
+    private ICategoryRepository categoryDAO;
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
 

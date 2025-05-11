@@ -1,4 +1,4 @@
-package com.example.loudlygmz.config;
+package com.example.loudlygmz.infrastructure.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.example.loudlygmz.utils;
+package com.example.loudlygmz.infrastructure.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

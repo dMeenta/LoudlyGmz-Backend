@@ -1,6 +1,6 @@
-package com.example.loudlygmz.utils;
+package com.example.loudlygmz.infrastructure.common;
 
-import com.example.loudlygmz.entity.User;
+import com.example.loudlygmz.domain.model.User;
 
 public class SanitizationUtils {
 
