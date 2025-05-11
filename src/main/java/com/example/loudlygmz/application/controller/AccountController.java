@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.loudlygmz.application.dto.login.LoginResponse;
+import com.example.loudlygmz.application.dto.user.UserLoginRequest;
 import com.example.loudlygmz.application.dto.user.UserRegisterRequest;
 import com.example.loudlygmz.application.dto.user.UserResponse;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
@@ -31,6 +33,15 @@ public class AccountController {
             HttpStatus.CREATED.value(),
             "Usuario registrado correctamente",
             user));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody UserLoginRequest request) {
+        LoginResponse response = accountOrchestrator.login(request);
+        return ResponseEntity.ok(ApiResponse.success(
+            HttpStatus.OK.value(),
+            "Inicio de sesión exitoso",
+            response));
     }
     
 }

@@ -7,7 +7,13 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.net.URI;
@@ -22,14 +28,29 @@ public class FirebaseAuthClient {
     @Value("${firebase.api.key}")
     private String firebaseApiKey;
 
+    private final RestTemplate restTemplate = new RestTemplate();
+
     // Método para iniciar sesión
-    public Map<String, String> signInWithEmailAndPassword(String email, String password) throws IOException {
+    public Map<String, String> signInWithEmailAndPassword(String email, String password){
+    
+        String firebaseEndpoint = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + firebaseApiKey;
         Map<String, Object> payload = Map.of(
             "email", email,
             "password", password,
             "returnSecureToken", true
         );
-        return sendFirebaseAuthRequest("signInWithPassword", payload);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
+        
+        try {
+            ResponseEntity<Map> response = restTemplate.postForEntity(firebaseEndpoint, request, Map.class);
+            return (Map<String, String>) response.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException("Error al autenticar con Firebase: " + e.getResponseBodyAsString(), e);
+        }
     }
 
     // Método para registrar un nuevo usuario
