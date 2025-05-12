@@ -1,5 +1,6 @@
 package com.example.loudlygmz.infrastructure.common;
 
+import com.example.loudlygmz.application.exception.InvalidCredentialsException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,6 +50,9 @@ public class FirebaseAuthClient {
             ResponseEntity<Map> response = restTemplate.postForEntity(firebaseEndpoint, request, Map.class);
             return (Map<String, String>) response.getBody();
         } catch (HttpClientErrorException e) {
+            if (e.getResponseBodyAsString().contains("INVALID_LOGIN_CREDENTIALS")) {
+                throw new InvalidCredentialsException("Correo o contraseña incorrectos.");
+            }
             throw new RuntimeException("Error al autenticar con Firebase: " + e.getResponseBodyAsString(), e);
         }
     }
