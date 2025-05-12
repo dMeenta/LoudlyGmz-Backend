@@ -1,17 +1,16 @@
 package com.example.loudlygmz.infrastructure.orchestrator;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.loudlygmz.application.dto.login.FirebaseLoginData;
 import com.example.loudlygmz.application.dto.login.LoginResponse;
 import com.example.loudlygmz.application.dto.user.UserLoginRequest;
 import com.example.loudlygmz.application.dto.user.UserRegisterRequest;
 import com.example.loudlygmz.application.dto.user.UserRequest;
 import com.example.loudlygmz.application.dto.user.UserResponse;
 import com.example.loudlygmz.domain.service.IUserService;
-import com.example.loudlygmz.infrastructure.common.FirebaseAuthClient;
+import com.example.loudlygmz.infrastructure.firebase.FirebaseAuthClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,17 +45,17 @@ public class AccountOrchestrator {
 
     public LoginResponse login(UserLoginRequest request){
 
-        Map<String, String> firebaseData = firebaseAuthClient.signInWithEmailAndPassword(
+        FirebaseLoginData firebaseData = firebaseAuthClient.signInWithEmailAndPassword(
             request.getEmail(), request.getPassword());
         
         //Id del Usuario
-        String uid = firebaseData.get("localId");
+        String uid = firebaseData.getLocalId();
         //	Un JWT que representa una sesión activa. Es usado para autenticar solicitudes.
-        String idToken = firebaseData.get("idToken");
+        String idToken = firebaseData.getIdToken();
         //Token para renovar la sesión
-        String refreshToken = firebaseData.get("refreshToken");
+        String refreshToken = firebaseData.getRefreshToken();
         //Tiempo en el que expira la sesión - En segundos
-        Long expiresIn = Long.parseLong(firebaseData.get("expiresIn"));
+        Long expiresIn = Long.parseLong(firebaseData.getExpiresIn());
         
         UserResponse user = userService.getUserByUid(uid);
 
