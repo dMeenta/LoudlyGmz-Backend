@@ -1,27 +1,28 @@
 package com.example.loudlygmz.infrastructure.seed;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 
 import com.example.loudlygmz.domain.model.Category;
 import com.example.loudlygmz.domain.model.Game;
+import com.example.loudlygmz.domain.model.GameAssets;
 import com.example.loudlygmz.domain.repository.ICategoryRepository;
 import com.example.loudlygmz.domain.repository.IGameRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class DatabaseSeeder implements CommandLineRunner {
 
-    @Autowired
-    private IGameRepository gameDAO;
-
-    @Autowired
-    private ICategoryRepository categoryDAO;
+    private final IGameRepository gameDAO;
+    private final ICategoryRepository categoryDAO;
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
 
@@ -48,39 +49,150 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         categoryDAO.saveAll(List.of(action, adventure, role, twoD, threeD, metroidvania, platform, moba, tacticalShooter));
 
-        Game g1 = new Game("League of Legends", "League of Legends es un juego de estrategia por equipos en el que dos equipos de cinco campeones se enfrentan para ver quién destruye antes la base del otro. Elige de entre un elenco de 140 campeones para realizar jugadas épicas, asesinar rivales y derribar torretas para alzarte con la victoria.","2009-10-27", "Riot Games");
-        g1.setCategories(List.of(action, role, moba));
-        Game g2 = new Game("Valorant", "Un juego de disparos táctico 5v5 basado en personajes.","2020-06-02", "Riot Games");
-        g2.setCategories(List.of(action, threeD, tacticalShooter));
-        Game g3 = new Game("Hollow Knight", "¡Forja tu propio camino en Hollow Knight! Una aventura épica a través de un vasto reino de insectos y héroes que se encuentra en ruinas. Explora cavernas tortuosas, combate contra criaturas corrompidas y entabla amistad con extraños insectos, todo en un estilo clásico en 2D dibujado a mano.","2017-02-24", "Team Cherry");
-        g3.setCategories(List.of(action, adventure, twoD, metroidvania, platform));
-        Game g4 = new Game("Kingdom Hearts", "Kingdom Hearts es el resultado de una colaboración entre Square y The Walt Disney Company.","2002-03-28", "Squaresoft");
-        g4.setCategories(List.of(action, adventure, role, threeD));
-        Game g5 = new Game("Kingdom Hearts Chain Of Memories", "Kingdom Hearts: Chain Of Memories retoma la historia donde acaba Kingdom Hearts 1 y los primeros 50-60 días de Kingdom Hearts 358/2 Days.","2004-11-11", "Square Enix");
-        g5.setCategories(List.of(action, adventure, role, threeD));
-        Game g6 = new Game("Kingdom Hearts 2", "Kingdom Hearts 2 es la secuela directa de Kingdom Hearts: Chain of Memories.","2005-12-22", "Square Enix");
-        g6.setCategories(List.of(action, adventure, role, threeD));
-        Game g7 = new Game("Counter-Strike: Global Offensive", "Un icónico juego de disparos táctico en primera persona donde equipos de terroristas y antiterroristas compiten en misiones estratégicas.", "2012-08-21", "Valve");
-        g7.setCategories(List.of(action, tacticalShooter, threeD));
-        Game g8 = new Game("Warface", "Un FPS táctico con modos cooperativos y competitivos, ofreciendo misiones dinámicas y múltiples clases de personajes.", "2013-10-21", "Crytek");
-        g8.setCategories(List.of(action, tacticalShooter, threeD));
-        Game g9 = new Game("Apex Legends", "Un shooter táctico basado en escuadrones con héroes únicos, ambientado en el universo de Titanfall.", "2019-02-04", "Respawn Entertainment");
-        g9.setCategories(List.of(action, moba, threeD));
-        Game g10 = new Game("Enlisted", "Un shooter táctico ambientado en la Segunda Guerra Mundial donde los jugadores controlan escuadrones de soldados en combates históricos.", "2021-04-08", "Darkflow Software");
-        g10.setCategories(List.of(action, threeD));
-        Game g11 = new Game("Super Mario Odyssey", "Mario emprende una aventura en un mundo de plataformas 3D para rescatar a la princesa Peach usando su nuevo compañero, Cappy.", "2017-10-27", "Nintendo");
-        g11.setCategories(List.of(adventure, threeD, platform));
-        Game g12 = new Game("Ori and the Blind Forest", "Un juego de plataformas que combina una hermosa narrativa con desafiantes mecánicas mientras Ori intenta salvar su bosque.", "2015-03-11", "Moon Studios");
-        g12.setCategories(List.of(adventure, twoD, metroidvania));
-        Game g13 = new Game("Celeste", "Ayuda a Madeline a escalar la montaña Celeste enfrentando desafiantes niveles de plataformas y sus propios miedos.", "2018-01-25", "Maddy Makes Games");
-        g13.setCategories(List.of(adventure, twoD, metroidvania));
-        Game g14 = new Game("The Witcher 3: Wild Hunt", "Un RPG de mundo abierto donde Geralt de Rivia busca a su hija adoptiva mientras enfrenta monstruos y decisiones morales.", "2015-05-19", "CD Projekt Red");
-        g14.setCategories(List.of(action, role));
-        Game g15 = new Game("Elden Ring", "Un juego de rol de acción ambientado en un mundo abierto, con una historia creada por Hidetaka Miyazaki y George R.R. Martin.", "2022-02-25", "FromSoftware");
-        g15.setCategories(List.of(action, role, threeD));
-        Game g16 = new Game("Final Fantasy XV", "Un juego de rol épico donde el príncipe Noctis y sus amigos intentan recuperar su reino de las fuerzas enemigas.", "2016-11-29", "Square Enix");
-        g16.setCategories(List.of(action, role, threeD));
+        Game g1 = Game.builder()
+        .name("League of Legends")
+        .description("League of Legends es un juego de estrategia por equipos en el que dos equipos de cinco campeones se enfrentan para ver quién destruye antes la base del otro. Elige de una aplia gama de campeones para realizar jugadas épicas, asesinar rivales y derribar torretas para alzarte con la victoria.")
+        .release_date(LocalDate.parse("2009-10-27"))
+        .developer("Riot Games")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, role, moba))
+        .build();
 
+        Game g2 = Game.builder()
+        .name("Valorant")
+        .description("Un juego de disparos táctico 5v5 basado en personajes.")
+        .release_date(LocalDate.parse("2020-06-02"))
+        .developer("Riot Games")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, threeD, tacticalShooter))
+        .build();
+
+        Game g3 = Game.builder()
+        .name("Hollow Knight")
+        .description("¡Forja tu propio camino en Hollow Knight! Una aventura épica a través de un vasto reino de insectos y héroes que se encuentra en ruinas. Explora cavernas tortuosas, combate contra criaturas corrompidas y entabla amistad con extraños insectos, todo en un estilo clásico en 2D dibujado a mano.")
+        .release_date(LocalDate.parse("2017-02-24"))
+        .developer("Team Cherry")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, adventure, twoD, metroidvania, platform))
+        .build();
+        
+        Game g4 = Game.builder()
+        .name("Kingdom Hearts")
+        .description("Kingdom Hearts es el resultado de una colaboración entre Square y The Walt Disney Company.")
+        .release_date(LocalDate.parse("2002-03-28"))
+        .developer("Squaresoft")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, adventure, role, threeD))
+        .build();
+
+        Game g5 = Game.builder()
+        .name("Kingdom Hearts Chain Of Memories")
+        .description("Kingdom Hearts: Chain Of Memories retoma la historia donde acaba Kingdom Hearts 1 y los primeros 50-60 días de Kingdom Hearts 358/2 Days.")
+        .release_date(LocalDate.parse("2004-11-11"))
+        .developer("Square Enix")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, adventure, role, threeD))
+        .build();
+
+        Game g6 = Game.builder()
+        .name("Kingdom Hearts 2")
+        .description("Kingdom Hearts 2 es la secuela directa de Kingdom Hearts: Chain of Memories.")
+        .release_date(LocalDate.parse("2005-12-22"))
+        .developer("Square Enix")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, adventure, role, threeD))
+        .build();
+
+        Game g7 = Game.builder()
+        .name("Counter-Strike: Global Offensive")
+        .description("Un icónico juego de disparos táctico en primera persona donde equipos de terroristas y antiterroristas compiten en misiones estratégicas.")
+        .release_date(LocalDate.parse("2012-08-21"))
+        .developer("Valve")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, tacticalShooter, threeD))
+        .build();
+
+        Game g8 = Game.builder()
+        .name("Warface")
+        .description("Un FPS táctico con modos cooperativos y competitivos, ofreciendo misiones dinámicas y múltiples clases de personajes.")
+        .release_date(LocalDate.parse("2013-10-21"))
+        .developer("Crytek")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, tacticalShooter, threeD))
+        .build();
+
+        Game g9 = Game.builder()
+        .name("Apex Legends")
+        .description("Un shooter táctico basado en escuadrones con héroes únicos, ambientado en el universo de Titanfall.")
+        .release_date(LocalDate.parse("2019-02-04"))
+        .developer("Respawn Entertainment")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, moba, threeD))
+        .build();
+
+        Game g10 = Game.builder()
+        .name("Enlisted")
+        .description("Un shooter táctico ambientado en la Segunda Guerra Mundial donde los jugadores controlan escuadrones de soldados en combates históricos.")
+        .release_date(LocalDate.parse("2021-04-08"))
+        .developer("Darkflow Software")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, threeD))
+        .build();
+
+        Game g11 = Game.builder()
+        .name("Super Mario Odyssey")
+        .description("Mario emprende una aventura en un mundo de plataformas 3D para rescatar a la princesa Peach usando su nuevo compañero, Cappy.")
+        .release_date(LocalDate.parse("2017-10-27"))
+        .developer("Nintendo")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(adventure, threeD, platform))
+        .build();
+
+        Game g12 = Game.builder()
+        .name("Ori and the Blind Forest")
+        .description("Un juego de plataformas que combina una hermosa narrativa con desafiantes mecánicas mientras Ori intenta salvar su bosque.")
+        .release_date(LocalDate.parse("2015-03-11"))
+        .developer("Moon Studios")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(adventure, twoD, metroidvania))
+        .build();
+
+        Game g13 = Game.builder()
+        .name("Celeste")
+        .description("Ayuda a Madeline a escalar la montaña Celeste enfrentando desafiantes niveles de plataformas y sus propios miedos.")
+        .release_date(LocalDate.parse("2018-01-25"))
+        .developer("Maddy Makes Games")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(adventure, twoD, metroidvania))
+        .build();
+
+        Game g14 = Game.builder()
+        .name("The Witcher 3: Wild Hunt")
+        .description("Un RPG de mundo abierto donde Geralt de Rivia busca a su hija adoptiva mientras enfrenta monstruos y decisiones morales.")
+        .release_date(LocalDate.parse("2015-05-19"))
+        .developer("CD Projekt Red")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, role))
+        .build();
+
+        Game g15 = Game.builder()
+        .name("Elden Ring")
+        .description("Un juego de rol de acción ambientado en un mundo abierto, con una historia creada por Hidetaka Miyazaki y George R.R. Martin.")
+        .release_date(LocalDate.parse("2022-02-25"))
+        .developer("FromSoftware")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, role, threeD))
+        .build();
+
+        Game g16 = Game.builder()
+        .name("Final Fantasy XV")
+        .description("Un juego de rol épico donde el príncipe Noctis y sus amigos intentan recuperar su reino de las fuerzas enemigas.")
+        .release_date(LocalDate.parse("2016-11-29"))
+        .developer("Square Enix")
+        .assets(new GameAssets("", "", "", ""))
+        .categories(List.of(action, role, threeD))
+        .build();
+        
         gameDAO.saveAll(List.of(g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g13, g14, g15, g16));
     }
 }
