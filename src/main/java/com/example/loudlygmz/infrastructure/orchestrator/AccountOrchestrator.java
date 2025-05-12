@@ -1,10 +1,9 @@
 package com.example.loudlygmz.infrastructure.orchestrator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.loudlygmz.application.dto.login.FirebaseLoginData;
-import com.example.loudlygmz.application.dto.login.LoginResponse;
+import com.example.loudlygmz.application.dto.FirebaseLoginData;
+import com.example.loudlygmz.application.dto.LoginResponse;
 import com.example.loudlygmz.application.dto.user.UserLoginRequest;
 import com.example.loudlygmz.application.dto.user.UserRegisterRequest;
 import com.example.loudlygmz.application.dto.user.UserRequest;
@@ -18,10 +17,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AccountOrchestrator {
 
-    @Autowired
-    private FirebaseAuthClient firebaseAuthClient;
-    @Autowired
-    private IUserService userService;
+    private final FirebaseAuthClient firebaseAuthClient;
+    private final IUserService userService;
 
     public UserResponse registerUser(UserRegisterRequest request){
         

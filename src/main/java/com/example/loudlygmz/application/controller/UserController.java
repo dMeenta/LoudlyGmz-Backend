@@ -1,6 +1,5 @@
 package com.example.loudlygmz.application.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,15 +9,17 @@ import com.example.loudlygmz.application.dto.user.UserResponse;
 import com.example.loudlygmz.domain.service.IUserService;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
     
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
 
     @GetMapping("/{uid}")
     public ResponseEntity<ApiResponse<UserResponse>> getUserByUid(@PathVariable String uid) {

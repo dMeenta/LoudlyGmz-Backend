@@ -2,7 +2,6 @@ package com.example.loudlygmz.infrastructure.service.impl;
 
 import java.time.LocalDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.application.dto.user.UserRequest;
@@ -14,12 +13,13 @@ import com.example.loudlygmz.domain.service.IUserService;
 import com.example.loudlygmz.infrastructure.common.SanitizationUtils;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements IUserService{
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     
     @Override
     public UserResponse createUser(UserRequest request) {
