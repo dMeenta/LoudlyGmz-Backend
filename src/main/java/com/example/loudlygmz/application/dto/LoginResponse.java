@@ -1,4 +1,4 @@
-package com.example.loudlygmz.application.dto.login;
+package com.example.loudlygmz.application.dto;
 
 import com.example.loudlygmz.application.dto.user.UserResponse;
 

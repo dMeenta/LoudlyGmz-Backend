@@ -1,4 +1,4 @@
-package com.example.loudlygmz.application.dto.login;
+package com.example.loudlygmz.application.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
