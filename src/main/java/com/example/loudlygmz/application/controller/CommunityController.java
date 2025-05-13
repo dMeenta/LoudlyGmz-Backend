@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.loudlygmz.application.dto.community.JoinCommunityRequest;
-import com.example.loudlygmz.application.dto.community.JoinCommunityResponse;
+import com.example.loudlygmz.application.dto.community.CommunityMembershipRequest;
+import com.example.loudlygmz.application.dto.community.CommunityMembershipResponse;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 import com.example.loudlygmz.infrastructure.orchestrator.CommunityOrchestrator;
 
@@ -25,22 +25,27 @@ public class CommunityController {
     private final CommunityOrchestrator communityOrchestrator;
 
     @PostMapping("/join")
-    public ResponseEntity<ApiResponse<JoinCommunityResponse>> joinCommunity(@Valid @RequestBody JoinCommunityRequest request) {
-        JoinCommunityResponse response = communityOrchestrator.joinCommunity(request.getUserId(), request.getGameId());
-
+    public ResponseEntity<ApiResponse<CommunityMembershipResponse>> joinCommunity(@Valid @RequestBody CommunityMembershipRequest request) {
+        CommunityMembershipResponse response = communityOrchestrator.joinCommunity(request.getUserId(), request.getGameId());
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK.value(),
-                "Usuario ingreso a la comunidad",
+                response.getMessage(),
                 response));
     }
-    /* 
 
     @PostMapping("/leave")
-    public ResponseEntity<?> leaveCommunity(@RequestBody CommunityRequests request) {
-        return communityService.leaveCommunity(request);
+    public ResponseEntity<ApiResponse<CommunityMembershipResponse>> leaveCommunity(@RequestBody CommunityMembershipRequest request) {
+        CommunityMembershipResponse response = communityOrchestrator.leaveCommunity(request.getUserId(), request.getGameId());
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK.value(),
+                response.getMessage(),
+                response));
     }
 
+    /*
+    
     @GetMapping("/isMember")
     public ResponseEntity<?> checkMembership(@RequestParam String userId, @RequestParam Integer gameId) {
         return communityService.checkMembership(userId, gameId);

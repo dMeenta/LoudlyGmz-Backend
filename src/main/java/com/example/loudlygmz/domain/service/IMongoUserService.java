@@ -6,6 +6,7 @@ import com.example.loudlygmz.domain.model.MongoUser;
 
 public interface IMongoUserService {
     MongoUser getOrCreateUser(String userId);
-    void addJoinedCommunity(String userId, Integer gameId, Instant joinedAt);
     boolean isUserInCommunity(String userId, Integer gameId);
+    void addJoinedCommunity(String userId, Integer gameId, Instant joinedAt);
+    void removeJoinedCommunity(String userId, Integer gameId);
 }

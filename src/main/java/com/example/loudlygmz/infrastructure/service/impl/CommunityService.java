@@ -38,6 +38,16 @@ public class CommunityService implements ICommunityService {
         return communityRepository.save(community);
     }
 
+    @Override
+    public void removeMember(Integer gameId, String userId) {
+        Community community = communityRepository.findById(gameId)
+        .orElseThrow(()-> new RuntimeException("Esta comunidad no existe"));
+
+        community.getMembers().removeIf(member -> member.userId().equals(userId));
+        communityRepository.save(community);
+    }
+    
+
    /*  @Override
     public ResponseEntity<?> leaveCommunity(CommunityRequests request) {
         try {

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class JoinCommunityRequest {
+public class CommunityMembershipRequest {
     
     @NotNull
     private String userId;

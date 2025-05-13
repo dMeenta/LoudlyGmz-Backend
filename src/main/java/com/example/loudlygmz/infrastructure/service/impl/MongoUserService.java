@@ -31,18 +31,6 @@ public class MongoUserService implements IMongoUserService{
             return user;
         });
     }
-    
-    @Override
-    public void addJoinedCommunity(String userId, Integer gameId, Instant joinedAt) {
-        MongoUser user = getOrCreateUser(userId);
-        List<JoinedCommunity> joinedCommunities = user.getJoinedCommunities();
-        boolean alreadyJoined = joinedCommunities.stream()
-            .anyMatch(c -> c.gameId().equals(gameId));
-        if (!alreadyJoined) {
-            joinedCommunities.add(new MongoUser.JoinedCommunity(gameId, joinedAt));
-            mongoUserRepository.save(user);
-        }    
-    }
 
     @Override
     public boolean isUserInCommunity(String userId, Integer gameId) {
@@ -50,6 +38,21 @@ public class MongoUserService implements IMongoUserService{
         .map(user -> user.getJoinedCommunities().stream()
         .anyMatch(c -> c.gameId().equals(gameId)))
         .orElse(false);
+    }
+    
+    @Override
+    public void addJoinedCommunity(String userId, Integer gameId, Instant joinedAt) {
+        MongoUser user = getOrCreateUser(userId);
+        List<JoinedCommunity> joinedCommunities = user.getJoinedCommunities();
+        joinedCommunities.add(new MongoUser.JoinedCommunity(gameId, joinedAt));
+        mongoUserRepository.save(user);
+    }
+
+    @Override
+    public void removeJoinedCommunity(String userId, Integer gameId) {
+        MongoUser user = getOrCreateUser(userId);
+        user.getJoinedCommunities().removeIf(c -> c.gameId().equals(gameId));
+        mongoUserRepository.save(user);
     }
     
 }
