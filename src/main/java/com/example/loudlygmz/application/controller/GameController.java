@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/games")
@@ -50,11 +48,6 @@ public class GameController {
                 HttpStatus.OK.value(),
                 "Juegos obtenidos por su categoría",
                 gameService.getGamesByCategory(id)));
-    }
-
-    @PostMapping("/user")
-    public ResponseEntity<?> getUserGames(@RequestBody List<Integer> idList ) {
-        return gameService.getUserGames(idList);
     }
 
 }

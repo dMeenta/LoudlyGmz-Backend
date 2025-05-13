@@ -1,5 +1,8 @@
 package com.example.loudlygmz.application.exception;
 
+import java.util.stream.Collectors;
+
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -24,24 +27,35 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Object>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(
+            ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null)
+        );
+    }
+
     @ExceptionHandler(FirebaseAuthException.class)
     public ResponseEntity<ApiResponse<Object>> handleFirebaseError(FirebaseAuthException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
             ApiResponse.error(
                 HttpStatus.BAD_REQUEST.value(),
-                "Error de Firebase: " + ex.getMessage(),
-                null)
+                "Error de Firebase",
+                ex.getMessage())
         );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getFieldError().getDefaultMessage();
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .collect(Collectors.joining("; "));
+
         return ResponseEntity.badRequest().body(
             ApiResponse.error(
                 HttpStatus.BAD_REQUEST.value(),
-                "Validación fallida: " + errorMessage,
-                null)
+                "Validación fallida",
+                errorMessage
+            )
         );
     }
 
@@ -55,14 +69,22 @@ public class GlobalExceptionHandler {
         ));
     }
 
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDataAccess(DataAccessException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+            ApiResponse.error(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Error al acceder a la base de datos",
+                ex.getMostSpecificCause().getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneral(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
             ApiResponse.error(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Error inesperado: " + ex.getMessage(),
-                null)
+                "Error inesperado",
+                ex.getMessage())
         );
     }
-
 }
