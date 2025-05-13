@@ -1,12 +1,8 @@
 package com.example.loudlygmz.infrastructure.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.application.dto.GameResponse;
@@ -14,7 +10,6 @@ import com.example.loudlygmz.domain.model.Category;
 import com.example.loudlygmz.domain.model.Game;
 import com.example.loudlygmz.domain.repository.IGameRepository;
 import com.example.loudlygmz.domain.service.IGameService;
-import com.example.loudlygmz.infrastructure.common.ApiResponse;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -60,17 +55,15 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public ResponseEntity<?> getUserGames(List<Integer> idList) {
-        try {
-            List<Game> response = new ArrayList<Game>();
-            for (Integer id : idList) {
-                Optional<Game> game = gameRepository.findById(id);
-                game.ifPresent(response::add);
-            }
-            return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Juegos del usuario obtenidos exitosamente", response));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error al obtener los juegos del usuario", null));
+    public List<GameResponse> getListOfGamesById(List<Integer> idList) {
+        for (Integer id : idList) {
+            if(id<=0){
+                throw new IllegalArgumentException("El ID:"+ id +" debe ser mayor que cero.");
+            }    
         }
+        return gameRepository.findAllById(idList).stream()
+        .map(this::toResponse)
+        .collect(Collectors.toList());
     }
 
     private GameResponse toResponse(Game game) {

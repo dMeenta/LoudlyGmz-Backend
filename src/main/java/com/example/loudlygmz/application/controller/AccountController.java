@@ -28,11 +28,11 @@ public class AccountController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody UserRegisterRequest request) {
-        UserResponse user = accountOrchestrator.registerUser(request);
+        UserResponse response = accountOrchestrator.registerUser(request);
         return ResponseEntity.ok(ApiResponse.success(
             HttpStatus.CREATED.value(),
             "Usuario registrado correctamente",
-            user));
+            response));
     }
 
     @PostMapping("/login")
