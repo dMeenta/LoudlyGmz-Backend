@@ -1,6 +1,6 @@
 package com.example.loudlygmz.infrastructure.firebase;
 
-import com.example.loudlygmz.application.dto.FirebaseLoginData;
+import com.example.loudlygmz.application.dto.auth.FirebaseLoginData;
 import com.example.loudlygmz.application.exception.InvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;

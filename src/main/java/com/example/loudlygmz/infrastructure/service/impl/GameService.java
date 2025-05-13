@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.example.loudlygmz.application.dto.GameResponse;
+import com.example.loudlygmz.application.dto.game.GameResponse;
 import com.example.loudlygmz.domain.model.Category;
 import com.example.loudlygmz.domain.model.Game;
 import com.example.loudlygmz.domain.repository.IGameRepository;

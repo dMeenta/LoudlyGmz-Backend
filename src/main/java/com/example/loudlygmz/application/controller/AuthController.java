@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.loudlygmz.application.dto.PasswordResetRequest;
+import com.example.loudlygmz.application.dto.auth.PasswordResetRequest;
 import com.example.loudlygmz.domain.service.IAuthService;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 

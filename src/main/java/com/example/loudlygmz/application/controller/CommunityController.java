@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.loudlygmz.application.dto.JoinCommunityRequest;
-import com.example.loudlygmz.application.dto.JoinCommunityResponse;
+import com.example.loudlygmz.application.dto.community.JoinCommunityRequest;
+import com.example.loudlygmz.application.dto.community.JoinCommunityResponse;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 import com.example.loudlygmz.infrastructure.orchestrator.CommunityOrchestrator;
 
@@ -27,7 +27,7 @@ public class CommunityController {
     @PostMapping("/join")
     public ResponseEntity<ApiResponse<JoinCommunityResponse>> joinCommunity(@Valid @RequestBody JoinCommunityRequest request) {
         JoinCommunityResponse response = communityOrchestrator.joinCommunity(request.getUserId(), request.getGameId());
-        
+
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK.value(),

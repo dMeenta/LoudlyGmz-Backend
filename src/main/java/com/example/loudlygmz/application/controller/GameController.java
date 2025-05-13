@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.loudlygmz.application.dto.GameResponse;
+import com.example.loudlygmz.application.dto.game.GameResponse;
 import com.example.loudlygmz.domain.service.IGameService;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 

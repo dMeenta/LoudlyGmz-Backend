@@ -2,7 +2,7 @@ package com.example.loudlygmz.domain.service;
 
 import java.util.List;
 
-import com.example.loudlygmz.application.dto.GameResponse;
+import com.example.loudlygmz.application.dto.game.GameResponse;
 
 public interface IGameService {
     List<GameResponse> getGames();

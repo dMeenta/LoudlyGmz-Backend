@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.loudlygmz.application.dto.LoginResponse;
+import com.example.loudlygmz.application.dto.auth.LoginResponse;
 import com.example.loudlygmz.application.dto.user.UserLoginRequest;
 import com.example.loudlygmz.application.dto.user.UserRegisterRequest;
 import com.example.loudlygmz.application.dto.user.UserResponse;

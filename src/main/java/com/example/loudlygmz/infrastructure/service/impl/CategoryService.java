@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.example.loudlygmz.application.dto.CategoryResponse;
+import com.example.loudlygmz.application.dto.category.CategoryResponse;
 import com.example.loudlygmz.domain.model.Category;
 import com.example.loudlygmz.domain.repository.ICategoryRepository;
 import com.example.loudlygmz.domain.service.ICategoryService;

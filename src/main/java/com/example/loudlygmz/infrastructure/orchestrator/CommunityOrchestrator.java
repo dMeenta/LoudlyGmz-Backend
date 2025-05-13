@@ -4,8 +4,8 @@ import java.time.Instant;
 
 import org.springframework.stereotype.Service;
 
-import com.example.loudlygmz.application.dto.GameResponse;
-import com.example.loudlygmz.application.dto.JoinCommunityResponse;
+import com.example.loudlygmz.application.dto.community.JoinCommunityResponse;
+import com.example.loudlygmz.application.dto.game.GameResponse;
 import com.example.loudlygmz.application.dto.user.UserResponse;
 import com.example.loudlygmz.domain.service.ICommunityService;
 import com.example.loudlygmz.domain.service.IMongoUserService;

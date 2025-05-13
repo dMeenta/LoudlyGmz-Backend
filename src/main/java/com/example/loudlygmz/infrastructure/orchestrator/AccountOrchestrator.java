@@ -2,8 +2,8 @@ package com.example.loudlygmz.infrastructure.orchestrator;
 
 import org.springframework.stereotype.Service;
 
-import com.example.loudlygmz.application.dto.FirebaseLoginData;
-import com.example.loudlygmz.application.dto.LoginResponse;
+import com.example.loudlygmz.application.dto.auth.FirebaseLoginData;
+import com.example.loudlygmz.application.dto.auth.LoginResponse;
 import com.example.loudlygmz.application.dto.user.UserLoginRequest;
 import com.example.loudlygmz.application.dto.user.UserRegisterRequest;
 import com.example.loudlygmz.application.dto.user.UserRequest;

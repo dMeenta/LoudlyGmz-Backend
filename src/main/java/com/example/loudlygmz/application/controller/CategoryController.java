@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.loudlygmz.application.dto.CategoryResponse;
+import com.example.loudlygmz.application.dto.category.CategoryResponse;
 import com.example.loudlygmz.domain.service.ICategoryService;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 
