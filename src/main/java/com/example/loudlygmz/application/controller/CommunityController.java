@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.loudlygmz.application.dto.JoinCommunityRequest;
+import com.example.loudlygmz.application.dto.JoinCommunityResponse;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 import com.example.loudlygmz.infrastructure.orchestrator.CommunityOrchestrator;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
@@ -23,13 +25,14 @@ public class CommunityController {
     private final CommunityOrchestrator communityOrchestrator;
 
     @PostMapping("/join")
-    public ResponseEntity<ApiResponse<?>> joinCommunity(@RequestBody JoinCommunityRequest request) {
-        communityOrchestrator.joinCommunity(request.getUserId(), request.getGameId());
+    public ResponseEntity<ApiResponse<JoinCommunityResponse>> joinCommunity(@Valid @RequestBody JoinCommunityRequest request) {
+        JoinCommunityResponse response = communityOrchestrator.joinCommunity(request.getUserId(), request.getGameId());
+        
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK.value(),
                 "Usuario ingreso a la comunidad",
-                null));
+                response));
     }
     /* 
 
