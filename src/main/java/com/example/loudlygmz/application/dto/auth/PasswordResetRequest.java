@@ -1,4 +1,4 @@
-package com.example.loudlygmz.application.dto;
+package com.example.loudlygmz.application.dto.auth;
 
 import lombok.Data;
 

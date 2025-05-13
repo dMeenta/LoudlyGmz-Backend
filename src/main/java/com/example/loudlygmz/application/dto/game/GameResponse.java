@@ -1,4 +1,4 @@
-package com.example.loudlygmz.application.dto;
+package com.example.loudlygmz.application.dto.game;
 
 import java.time.LocalDate;
 import java.util.List;

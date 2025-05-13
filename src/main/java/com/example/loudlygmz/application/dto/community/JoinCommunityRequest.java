@@ -1,4 +1,4 @@
-package com.example.loudlygmz.application.dto;
+package com.example.loudlygmz.application.dto.community;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
