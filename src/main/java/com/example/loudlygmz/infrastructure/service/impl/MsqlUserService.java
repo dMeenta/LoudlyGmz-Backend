@@ -4,26 +4,26 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
-import com.example.loudlygmz.application.dto.user.UserRequest;
-import com.example.loudlygmz.application.dto.user.UserResponse;
-import com.example.loudlygmz.domain.model.Role;
-import com.example.loudlygmz.domain.model.User;
-import com.example.loudlygmz.domain.repository.UserRepository;
-import com.example.loudlygmz.domain.service.IUserService;
+import com.example.loudlygmz.application.dto.user.MsqlUserRequest;
+import com.example.loudlygmz.application.dto.user.MsqlUserResponse;
+import com.example.loudlygmz.domain.enums.Role;
+import com.example.loudlygmz.domain.model.MsqlUser;
+import com.example.loudlygmz.domain.repository.IMsqUserlRepository;
+import com.example.loudlygmz.domain.service.IMsqlUserService;
 import com.example.loudlygmz.infrastructure.common.SanitizationUtils;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 @Service
-@RequiredArgsConstructor
-public class UserService implements IUserService{
+public class MsqlUserService implements IMsqlUserService {
 
-    private final UserRepository userRepository;
-    
+    private final IMsqUserlRepository msqUserlRepository;
+
     @Override
-    public UserResponse createUser(UserRequest request) {
-        User user = new User();
+    public MsqlUserResponse createUser(MsqlUserRequest request) {
+        MsqlUser user = new MsqlUser();
         user.setUid(request.getUid());
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
@@ -34,32 +34,30 @@ public class UserService implements IUserService{
 
         user = SanitizationUtils.sanitizeUser(user);
 
-        userRepository.save(user);
+        msqUserlRepository.save(user);
 
-        return new UserResponse(
+        return new MsqlUserResponse(
             user.getUid(),
             user.getUsername(),
             user.getEmail(),
             user.getBiography(),
             user.getProfilePicture(),
             user.getRole().name(),
-            user.getCreationDate()
-            );
+            user.getCreationDate());
     }
 
     @Override
-    public UserResponse getUserByUid(String uid) {
-        User user = userRepository.findById(uid)
+    public MsqlUserResponse getUserByUid(String uid) {
+        MsqlUser user = msqUserlRepository.findById(uid)
         .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         
-        return new UserResponse(
+        return new MsqlUserResponse(
             user.getUid(),
             user.getUsername(),
             user.getEmail(),
             user.getBiography(),
             user.getProfilePicture(),
             user.getRole().name(),
-            user.getCreationDate()
-        );
-    }
+            user.getCreationDate());
+    }   
 }

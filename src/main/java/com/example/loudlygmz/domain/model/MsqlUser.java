@@ -10,10 +10,12 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+import com.example.loudlygmz.domain.enums.Role;
+
 @Data
 @Entity
 @Table(name = "users")
-public class User {
+public class MsqlUser {
     
     @Id
     private String uid;

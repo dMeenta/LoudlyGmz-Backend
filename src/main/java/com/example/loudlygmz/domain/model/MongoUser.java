@@ -11,7 +11,6 @@ import lombok.Data;
 @Data
 @Document(collection = "users")
 public class MongoUser {
-    
     @Id
     private String id;
 

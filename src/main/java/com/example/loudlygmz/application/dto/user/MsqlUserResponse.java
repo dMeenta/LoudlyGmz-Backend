@@ -1,10 +1,7 @@
 package com.example.loudlygmz.application.dto.user;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import com.example.loudlygmz.domain.enums.Role;
-import com.example.loudlygmz.domain.model.MongoUser.JoinedCommunity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
@@ -12,17 +9,13 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UserResponse {
+public class MsqlUserResponse {
     private String uid;
     private String username;
     private String email;
     private String biography;
     private String profilePicture;
-    private Role role;
-    private List<JoinedCommunity> joinedCommunities;
-    private List<String> friendIds;
-    private List<String> chatsIds;
-    
+    private String role;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime creationDate;
 }
