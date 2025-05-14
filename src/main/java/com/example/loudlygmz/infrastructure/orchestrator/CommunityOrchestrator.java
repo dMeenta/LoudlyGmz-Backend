@@ -8,9 +8,6 @@ import com.example.loudlygmz.application.dto.community.CommunityMembershipRespon
 import com.example.loudlygmz.application.dto.game.GameResponse;
 import com.example.loudlygmz.application.dto.user.UserResponse;
 import com.example.loudlygmz.domain.enums.CommunityAction;
-import com.example.loudlygmz.domain.service.ICommunityService;
-import com.example.loudlygmz.domain.service.IMongoUserService;
-import com.example.loudlygmz.domain.service.IUserService;
 import com.example.loudlygmz.infrastructure.service.impl.GameService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,67 +15,62 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CommunityOrchestrator {
-
-    private final IUserService userService;
-    private final IMongoUserService mongoUserService;
+    
+    private final MongoCommunityOrchestrator mongoCommunityOrchestrator;
+    private final UserOrchestrator userOrchestrator;
     private final GameService gameService;
-    private final ICommunityService communityService;
+
+    private record UserAndGame(UserResponse user, GameResponse game) {}
+
+    private UserAndGame getUserAndGame(String userId, Integer gameId){
+        UserResponse user = userOrchestrator.getUserByUid(userId);
+        GameResponse game = gameService.getGameById(gameId);
+        return new UserAndGame(user, game);
+    }
 
     public CommunityMembershipResponse joinCommunity(String userId, Integer gameId){
         if(gameId <= 0){
             throw new RuntimeException("El ID del juego debe ser mayor a 0");
         }
 
-        GameResponse game = gameService.getGameById(gameId);
-        UserResponse user = userService.getUserByUid(userId);
+        String message = mongoCommunityOrchestrator.joinCommunity(userId, gameId);
 
-        if (game == null) {
-            throw new RuntimeException("El juego no existe en la base de datos");
-        }
+        UserAndGame object = getUserAndGame(userId, gameId);
 
-        if (user == null) {
-            throw new RuntimeException("El usuario no existe en la base de datos");
-        }
-
-        if(mongoUserService.isUserInCommunity(userId, gameId)){
+        if(message != null){
             throw new RuntimeException(
-                String.format("El usuario %s ya es parte de la comunidad de %s", user.getUsername(), game.getName()));
+                String.format(message, object.user().getUsername(), object.game().getName()));
         }
-
-        Instant now = Instant.now();
-
-        communityService.addMember(gameId, userId);
-        mongoUserService.addJoinedCommunity(userId, gameId, now);
 
         return new CommunityMembershipResponse(
-            CommunityAction.JOIN, userId, user.getUsername(), gameId, game.getName(), Instant.now()
-        );
+            CommunityAction.JOIN,
+            object.user.getUid(),
+            object.user.getUsername(),
+            object.game.getId(),
+            object.game.getName(),
+            Instant.now());
     }
 
     public CommunityMembershipResponse leaveCommunity(String userId, Integer gameId){
-        boolean isMember = mongoUserService.isUserInCommunity(userId, gameId);
-
-        GameResponse game = gameService.getGameById(gameId);
-
-        if (game == null) {
-            throw new RuntimeException("El juego no existe en la base de datos");
+        if(gameId <= 0){
+            throw new RuntimeException("El ID del juego debe ser mayor a 0");
         }
 
-        UserResponse user = userService.getUserByUid(userId);
+        String message = mongoCommunityOrchestrator.leaveCommunity(userId, gameId);
 
-        if (user == null) {
-            throw new RuntimeException("El usuario no existe en la base de datos");
-        }
+        UserAndGame object = getUserAndGame(userId, gameId);
 
-        if(!isMember){
+        if(message != null){
             throw new RuntimeException(
-                String.format("El usuario %s no es parte de la comunidad de %s", user.getUsername(), game.getName()));
+                String.format(message, object.user().getUsername(), object.game().getName()));
         }
-        communityService.removeMember(gameId, userId);
-        mongoUserService.removeJoinedCommunity(userId, gameId);
 
         return new CommunityMembershipResponse(
-            CommunityAction.LEAVE, userId, user.getUsername(), gameId, game.getName(), Instant.now()
-        );
+            CommunityAction.LEAVE,
+            object.user.getUid(),
+            object.user.getUsername(),
+            object.game.getId(),
+            object.game.getName(),
+            Instant.now());
     }
 }

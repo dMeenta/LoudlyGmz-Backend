@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.domain.model.Community;
+
 import com.example.loudlygmz.domain.repository.ICommunityRepository;
 import com.example.loudlygmz.domain.service.ICommunityService;
 
@@ -45,8 +46,7 @@ public class CommunityService implements ICommunityService {
 
         community.getMembers().removeIf(member -> member.userId().equals(userId));
         communityRepository.save(community);
-    }
-    
+    }    
 
    /*  @Override
     public ResponseEntity<?> leaveCommunity(CommunityRequests request) {
