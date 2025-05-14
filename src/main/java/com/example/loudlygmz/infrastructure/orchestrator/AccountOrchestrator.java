@@ -6,9 +6,8 @@ import com.example.loudlygmz.application.dto.auth.FirebaseLoginData;
 import com.example.loudlygmz.application.dto.auth.LoginResponse;
 import com.example.loudlygmz.application.dto.user.UserLoginRequest;
 import com.example.loudlygmz.application.dto.user.UserRegisterRequest;
-import com.example.loudlygmz.application.dto.user.UserRequest;
 import com.example.loudlygmz.application.dto.user.UserResponse;
-import com.example.loudlygmz.domain.service.IUserService;
+import com.example.loudlygmz.application.dto.user.MsqlUserRequest;
 import com.example.loudlygmz.infrastructure.firebase.FirebaseAuthClient;
 
 import lombok.RequiredArgsConstructor;
@@ -18,22 +17,21 @@ import lombok.RequiredArgsConstructor;
 public class AccountOrchestrator {
 
     private final FirebaseAuthClient firebaseAuthClient;
-    private final IUserService userService;
+    private final UserOrchestrator userOrchestrator;
+    
 
     public UserResponse registerUser(UserRegisterRequest request){
-        
         String uid = firebaseAuthClient.createFirebaseUser(request.getEmail(), request.getPassword());
 
-        UserRequest userRequest = new UserRequest();
-
-        userRequest.setUid(uid);
-        userRequest.setEmail(request.getEmail());
-        userRequest.setUsername(request.getUsername());
-        userRequest.setBiography(request.getBiography());
-        userRequest.setProfilePicture(request.getProfilePicture());
+        MsqlUserRequest msqlUserRequest = new MsqlUserRequest();
+        msqlUserRequest.setUid(uid);
+        msqlUserRequest.setEmail(request.getEmail());
+        msqlUserRequest.setUsername(request.getUsername());
+        msqlUserRequest.setBiography(request.getBiography());
+        msqlUserRequest.setProfilePicture(request.getProfilePicture());
 
         try {
-            return userService.createUser(userRequest);
+            return userOrchestrator.createUser(request, uid);
         } catch (Exception e) {
             firebaseAuthClient.deleteUser(uid);
             throw e;
@@ -54,7 +52,7 @@ public class AccountOrchestrator {
         //Tiempo en el que expira la sesión - En segundos
         Long expiresIn = Long.parseLong(firebaseData.getExpiresIn());
         
-        UserResponse user = userService.getUserByUid(uid);
+        UserResponse user = userOrchestrator.getUserByUid(uid);
 
         return new LoginResponse(idToken, refreshToken, expiresIn, user);
     }
