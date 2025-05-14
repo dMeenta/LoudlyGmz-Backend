@@ -20,37 +20,34 @@ public class MongoUserService implements IMongoUserService{
     private final IMongoUserRepository mongoUserRepository;
 
     @Override
-    public MongoUser getOrCreateUser(String userId) {
+    public MongoUser getUser(String userId) {
         return mongoUserRepository.findById(userId)
-        .orElseGet(() -> {
-            MongoUser user = new MongoUser();
-            user.setId(userId);
-            user.setJoinedCommunities(new ArrayList<>());
-            user.setFriendIds(new ArrayList<>());
-            user.setChatIds(new ArrayList<>());
-            return user;
-        });
+        .orElseThrow(() -> new RuntimeException(
+            "Este usuario no existe en la base de datos"));
     }
 
     @Override
-    public boolean isUserInCommunity(String userId, Integer gameId) {
-        return mongoUserRepository.findById(userId)
-        .map(user -> user.getJoinedCommunities().stream()
-        .anyMatch(c -> c.gameId().equals(gameId)))
-        .orElse(false);
+    public MongoUser createUser(String userId){
+        MongoUser user = new MongoUser();
+        user.setId(userId);
+        user.setJoinedCommunities(new ArrayList<>());
+        user.setFriendIds(new ArrayList<>());
+        user.setChatIds(new ArrayList<>());
+        return mongoUserRepository.save(user);
     }
     
     @Override
-    public void addJoinedCommunity(String userId, Integer gameId, Instant joinedAt) {
-        MongoUser user = getOrCreateUser(userId);
+    public void addJoinedCommunity(String userId, Integer gameId) {
+        Instant now = Instant.now();
+        MongoUser user = getUser(userId);
         List<JoinedCommunity> joinedCommunities = user.getJoinedCommunities();
-        joinedCommunities.add(new MongoUser.JoinedCommunity(gameId, joinedAt));
+        joinedCommunities.add(new MongoUser.JoinedCommunity(gameId, now));
         mongoUserRepository.save(user);
     }
 
     @Override
     public void removeJoinedCommunity(String userId, Integer gameId) {
-        MongoUser user = getOrCreateUser(userId);
+        MongoUser user = getUser(userId);
         user.getJoinedCommunities().removeIf(c -> c.gameId().equals(gameId));
         mongoUserRepository.save(user);
     }
