@@ -70,15 +70,8 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public GameDTO insertGame(GameDTO game) {
-        Game newGame = new Game();
-        newGame.setName(newGame.getName());
-        newGame.setDescription(newGame.getDescription());
-        newGame.setRelease_date(newGame.getRelease_date());
-        newGame.setCategories(newGame.getCategories());
-        newGame.setDeveloper(newGame.getDeveloper());
-        newGame.setAssets(newGame.getAssets());
-        return toResponse(gameRepository.save(newGame));
+    public GameDTO insertGame(Game game) {
+        return toResponse(gameRepository.save(game));
     }
 
     private GameDTO toResponse(Game game) {

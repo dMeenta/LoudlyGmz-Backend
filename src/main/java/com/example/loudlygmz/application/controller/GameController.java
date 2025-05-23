@@ -4,23 +4,30 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.loudlygmz.application.dto.game.GameDTO;
 import com.example.loudlygmz.domain.service.IGameService;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
-
+import com.example.loudlygmz.infrastructure.orchestrator.GameOrchestrator;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping("/api/games")
 @RequiredArgsConstructor
+@Validated
 public class GameController {
 
+    private final GameOrchestrator gameOrchestrator;
     private final IGameService gameService;
 
     @GetMapping
@@ -50,12 +57,14 @@ public class GameController {
                 gameService.getGamesByCategory(id)));
     }
 
-    public ResponseEntity<ApiResponse<GameDTO>> insertGame(GameDTO game){
-        return ResponseEntity.ok(
+
+    @PostMapping("/insert")
+    public ResponseEntity<ApiResponse<GameDTO>> insertGame(@Valid @RequestBody GameDTO game){
+        return ResponseEntity.status(HttpStatus.CREATED).body(
             ApiResponse.success(
-                HttpStatus.OK.value(),
-                "Juego insertado correctamente.",
-                gameService.insertGame(game)));
+                HttpStatus.CREATED.value(),
+                "Juego registrado correctamente.",
+                gameOrchestrator.insertGame(game)));
     }
 
 }
