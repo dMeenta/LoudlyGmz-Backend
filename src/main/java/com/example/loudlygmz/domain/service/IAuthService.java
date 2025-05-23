@@ -1,5 +1,8 @@
 package com.example.loudlygmz.domain.service;
 
+import com.example.loudlygmz.application.dto.auth.LoginResponse;
+import com.example.loudlygmz.application.dto.user.LoginRequestDTO;
+
 public interface IAuthService {
-    void sendPasswordResetEmail(String email);
+    LoginResponse login(LoginRequestDTO request);
 }
