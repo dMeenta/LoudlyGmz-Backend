@@ -8,8 +8,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class GameResponse {
-    private int id;
+public class GameDTO {
     private String name;
     private String description;
     private LocalDate release_date;
