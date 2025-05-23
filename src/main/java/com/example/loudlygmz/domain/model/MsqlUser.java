@@ -6,15 +6,20 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 import com.example.loudlygmz.domain.enums.Role;
 
-@Data
 @Entity
 @Table(name = "users")
+@Getter @Setter @ToString @AllArgsConstructor @NoArgsConstructor
 public class MsqlUser {
     
     @Id
@@ -34,7 +39,7 @@ public class MsqlUser {
     
     private String biography;
 
-    @Column(name = "creation_date", updatable = false)
-    private LocalDateTime creationDate = LocalDateTime.now();
+    @Column(name = "creation_date", insertable = false, updatable = false)
+    private LocalDateTime creationDate;
 
 }
