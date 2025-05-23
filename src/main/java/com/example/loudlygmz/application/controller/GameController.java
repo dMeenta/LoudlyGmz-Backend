@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.loudlygmz.application.dto.game.GameResponse;
+import com.example.loudlygmz.application.dto.game.GameDTO;
 import com.example.loudlygmz.domain.service.IGameService;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 
@@ -24,7 +24,7 @@ public class GameController {
     private final IGameService gameService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<GameResponse>>> getGames() {
+    public ResponseEntity<ApiResponse<List<GameDTO>>> getGames() {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK.value(),
@@ -33,7 +33,7 @@ public class GameController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<GameResponse>> getGameById(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<GameDTO>> getGameById(@PathVariable Integer id) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK.value(),
@@ -42,12 +42,20 @@ public class GameController {
     }            
     
     @GetMapping("/category/{id}")
-    public ResponseEntity<ApiResponse<List<GameResponse>>> getGamesByCategory(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<List<GameDTO>>> getGamesByCategory(@PathVariable Integer id) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK.value(),
                 "Juegos obtenidos por su categoría",
                 gameService.getGamesByCategory(id)));
+    }
+
+    public ResponseEntity<ApiResponse<GameDTO>> insertGame(GameDTO game){
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK.value(),
+                "Juego insertado correctamente.",
+                gameService.insertGame(game)));
     }
 
 }

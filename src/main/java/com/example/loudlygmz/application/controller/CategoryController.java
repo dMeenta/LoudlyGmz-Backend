@@ -33,7 +33,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable Integer id) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK.value(),

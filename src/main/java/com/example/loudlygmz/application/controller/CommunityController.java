@@ -15,8 +15,6 @@ import com.example.loudlygmz.infrastructure.orchestrator.CommunityOrchestrator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-
-
 @RestController
 @RequestMapping("/api/community")
 @RequiredArgsConstructor
