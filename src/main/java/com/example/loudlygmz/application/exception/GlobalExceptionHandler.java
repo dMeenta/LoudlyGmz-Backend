@@ -1,5 +1,6 @@
 package com.example.loudlygmz.application.exception;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataAccessException;
@@ -76,6 +77,16 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Error al acceder a la base de datos",
                 ex.getMostSpecificCause().getMessage()));
+    }
+
+    @ExceptionHandler(CategoryValidationException.class)
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleCategoryValidationException(CategoryValidationException ex) {
+        ApiResponse<Map<String, String>> response = ApiResponse.error(
+            HttpStatus.NOT_FOUND.value(),
+            ex.getMessage(),
+            ex.getValidationMap()
+        );
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
