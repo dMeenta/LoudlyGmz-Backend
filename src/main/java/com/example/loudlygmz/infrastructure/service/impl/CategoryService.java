@@ -27,7 +27,7 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public CategoryResponse getCategoryById(int id) {
+    public CategoryResponse getCategoryById(Integer id) {
         if (id <= 0) {
             throw new IllegalArgumentException("El ID de la categoría debe ser mayor que cero.");
         }
