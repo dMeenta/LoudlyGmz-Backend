@@ -1,11 +1,12 @@
 package com.example.loudlygmz.infrastructure.orchestrator;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.application.dto.community.CommunityMembershipResponse;
-import com.example.loudlygmz.application.dto.game.GameResponse;
+import com.example.loudlygmz.application.dto.game.GameDTO;
 import com.example.loudlygmz.application.dto.user.UserResponse;
 import com.example.loudlygmz.domain.enums.CommunityAction;
 import com.example.loudlygmz.infrastructure.service.impl.GameService;
@@ -20,11 +21,11 @@ public class CommunityOrchestrator {
     private final UserOrchestrator userOrchestrator;
     private final GameService gameService;
 
-    private record UserAndGame(UserResponse user, GameResponse game) {}
+    private record UserAndGame(UserResponse user, GameDTO game) {}
 
-    private UserAndGame getUserAndGame(String userId, Integer gameId){
-        UserResponse user = userOrchestrator.getUserByUid(userId);
-        GameResponse game = gameService.getGameById(gameId);
+    private UserAndGame getUserAndGame(String username, Integer gameId){
+        UserResponse user = userOrchestrator.getUserByUsername(username);
+        GameDTO game = gameService.getGameById(gameId);
         return new UserAndGame(user, game);
     }
 
@@ -33,21 +34,21 @@ public class CommunityOrchestrator {
             throw new RuntimeException("El ID del juego debe ser mayor a 0");
         }
 
-        String message = mongoCommunityOrchestrator.joinCommunity(userId, gameId);
+        Optional<String> message = mongoCommunityOrchestrator.joinCommunity(userId, gameId);
 
         UserAndGame object = getUserAndGame(userId, gameId);
 
-        if(message != null){
+        if(message.isPresent()){
             throw new RuntimeException(
-                String.format(message, object.user().getUsername(), object.game().getName()));
+                String.format(message.get(), object.user().getUsername(), object.game().getName()));
         }
 
         return new CommunityMembershipResponse(
             CommunityAction.JOIN,
-            object.user.getUid(),
-            object.user.getUsername(),
-            object.game.getId(),
-            object.game.getName(),
+            userId,
+            object.user().getUsername(),
+            gameId,
+            object.game().getName(),
             Instant.now());
     }
 
@@ -56,21 +57,21 @@ public class CommunityOrchestrator {
             throw new RuntimeException("El ID del juego debe ser mayor a 0");
         }
 
-        String message = mongoCommunityOrchestrator.leaveCommunity(userId, gameId);
+        Optional<String> message = mongoCommunityOrchestrator.leaveCommunity(userId, gameId);
 
         UserAndGame object = getUserAndGame(userId, gameId);
 
-        if(message != null){
+        if(message.isPresent()){
             throw new RuntimeException(
-                String.format(message, object.user().getUsername(), object.game().getName()));
+                String.format(message.get(), object.user().getUsername(), object.game().getName()));
         }
 
         return new CommunityMembershipResponse(
             CommunityAction.LEAVE,
-            object.user.getUid(),
-            object.user.getUsername(),
-            object.game.getId(),
-            object.game.getName(),
+            userId,
+            object.user().getUsername(),
+            gameId,
+            object.game().getName(),
             Instant.now());
     }
 }

@@ -10,6 +10,7 @@ import com.example.loudlygmz.domain.model.Community;
 import com.example.loudlygmz.domain.repository.ICommunityRepository;
 import com.example.loudlygmz.domain.service.ICommunityService;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -42,27 +43,13 @@ public class CommunityService implements ICommunityService {
     @Override
     public void removeMember(Integer gameId, String userId) {
         Community community = communityRepository.findById(gameId)
-        .orElseThrow(()-> new RuntimeException("Esta comunidad no existe"));
-
+        .orElseThrow(()-> new EntityNotFoundException(
+            String.format("La comunidad con ID: %s  comunidad no existe", gameId)));
         community.getMembers().removeIf(member -> member.userId().equals(userId));
         communityRepository.save(community);
     }    
 
-   /*  @Override
-    public ResponseEntity<?> leaveCommunity(CommunityRequests request) {
-        try {
-            String userId = request.getUserId();
-            Integer gameId = request.getGameId();
-            if (userId == null || gameId == null) {
-                return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Parámetros inválidos", "userId y/o gameId no pueden ser nulos"));
-            }
-            communityDAO.leaveCommunity(userId, gameId);
-            return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Abandonó la comunidad", null));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Hubo un error al abandonar a la comunidad", e.getMessage()));
-        }
-    }
-    
+   /*    
     @Override
     public ResponseEntity<?> checkMembership(String userId, Integer gameId){
         try {
