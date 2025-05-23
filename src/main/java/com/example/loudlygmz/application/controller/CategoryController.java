@@ -32,13 +32,13 @@ public class CategoryController {
         );
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable Integer id) {
+    @GetMapping("/{categoryName}")
+    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryByName(@PathVariable String categoryName) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK.value(),
                 "Categoría encontrada.",
-                categoryService.getCategoryById(id))
+                categoryService.getCategoryByName(categoryName))
         );
     }
 }
