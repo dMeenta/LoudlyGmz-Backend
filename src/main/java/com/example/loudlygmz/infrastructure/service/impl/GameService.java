@@ -35,7 +35,7 @@ public class GameService implements IGameService {
         return gameRepository.findById(id)
             .map(this::toResponse)
             .orElseThrow(() -> new EntityNotFoundException(
-                String.format("Juego con ID: $s no encontrado", id)));
+                String.format("Juego con ID: %s no encontrado", id)));
     }
 
     @Override

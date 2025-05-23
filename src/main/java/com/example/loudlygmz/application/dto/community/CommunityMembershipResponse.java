@@ -12,7 +12,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class CommunityMembershipResponse {
     private CommunityAction action;
-    private String userId;
     private String username;
     private Integer gameId;
     private String communityName;

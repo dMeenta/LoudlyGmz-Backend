@@ -29,14 +29,14 @@ public class CommunityOrchestrator {
         return new UserAndGame(user, game);
     }
 
-    public CommunityMembershipResponse joinCommunity(String userId, Integer gameId){
+    public CommunityMembershipResponse joinCommunity(String username, Integer gameId){
         if(gameId <= 0){
             throw new RuntimeException("El ID del juego debe ser mayor a 0");
         }
 
-        Optional<String> message = mongoCommunityOrchestrator.joinCommunity(userId, gameId);
-
-        UserAndGame object = getUserAndGame(userId, gameId);
+        UserAndGame object = getUserAndGame(username, gameId);
+        
+        Optional<String> message = mongoCommunityOrchestrator.joinCommunity(username, gameId);
 
         if(message.isPresent()){
             throw new RuntimeException(
@@ -45,21 +45,20 @@ public class CommunityOrchestrator {
 
         return new CommunityMembershipResponse(
             CommunityAction.JOIN,
-            userId,
             object.user().getUsername(),
             gameId,
             object.game().getName(),
             Instant.now());
     }
 
-    public CommunityMembershipResponse leaveCommunity(String userId, Integer gameId){
+    public CommunityMembershipResponse leaveCommunity(String username, Integer gameId){
         if(gameId <= 0){
             throw new RuntimeException("El ID del juego debe ser mayor a 0");
         }
 
-        Optional<String> message = mongoCommunityOrchestrator.leaveCommunity(userId, gameId);
+        UserAndGame object = getUserAndGame(username, gameId);
 
-        UserAndGame object = getUserAndGame(userId, gameId);
+        Optional<String> message = mongoCommunityOrchestrator.leaveCommunity(username, gameId);
 
         if(message.isPresent()){
             throw new RuntimeException(
@@ -68,7 +67,6 @@ public class CommunityOrchestrator {
 
         return new CommunityMembershipResponse(
             CommunityAction.LEAVE,
-            userId,
             object.user().getUsername(),
             gameId,
             object.game().getName(),
