@@ -58,23 +58,6 @@ public class FirebaseAuthClient {
         }
     }
 
-    // Método para restablecer la contraseña
-    public void sendPasswordResetEmail(String email) {
-        Map<String, Object> payload = Map.of(
-            "requestType", "PASSWORD_RESET",
-            "email", email
-        );
-
-        try {
-            sendFirebaseAuthRequest("sendOobCode", payload, Object.class);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("EMAIL_NOT_FOUND")) {
-                throw new RuntimeException("El correo no está registrado en Firebase.");
-            }
-            throw e;
-        }
-}
-
     public void deleteUser(String uid){
         try {
             FirebaseAuth.getInstance().deleteUser(uid);
