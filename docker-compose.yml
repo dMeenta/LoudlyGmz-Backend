@@ -1,0 +1,35 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - mongodb
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/mi_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_MONGODB_URI=mongodb://mongodb:27017/mi_db_mongo
+    networks:
+      - mi_red
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mi_db
+    networks:
+      - mi_red
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_DATABASE: mi_db_mongo
+    networks:
+      - mi_red
+
+networks:
+  mi_red:
+    driver: bridge
