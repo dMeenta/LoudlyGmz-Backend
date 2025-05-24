@@ -1,35 +1,34 @@
 version: '3'
 services:
-  app:
-    build: .
-    ports:
-      - "8080:8080"
-    depends_on:
-      - mysql
-      - mongodb
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/mi_db
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_MONGODB_URI=mongodb://mongodb:27017/mi_db_mongo
-    networks:
-      - mi_red
-
   mysql:
-    image: mysql:8
+    image: mysql:8.0
+    container_name: mysql-container
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mi_db
-    networks:
-      - mi_red
-
+    ports:
+      - "3306:3306"
+  
   mongodb:
     image: mongo:latest
+    container_name: mongodb-container
     environment:
-      MONGO_INITDB_DATABASE: mi_db_mongo
-    networks:
-      - mi_red
-
-networks:
-  mi_red:
-    driver: bridge
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - "27017:27017"
+  
+  springboot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mi_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongodb:27017/mi_db_mongo
+    depends_on:
+      - mysql
+      - mongodb
+    ports:
+      - "8080:8080"
