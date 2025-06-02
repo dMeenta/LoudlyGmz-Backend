@@ -48,13 +48,13 @@ public class GameController {
                 gameService.getGameById(id)));
     }            
     
-    @GetMapping("/category/{id}")
-    public ResponseEntity<ApiResponse<List<GameDTO>>> getGamesByCategory(@PathVariable Integer id) {
+    @GetMapping("/category/{categoryName}")
+    public ResponseEntity<ApiResponse<List<GameDTO>>> getGamesByCategory(@PathVariable String categoryName) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK.value(),
                 "Juegos obtenidos por su categoría",
-                gameService.getGamesByCategory(id)));
+                gameService.getGamesByCategory(categoryName)));
     }
 
 

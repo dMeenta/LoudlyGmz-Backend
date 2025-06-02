@@ -39,18 +39,14 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public List<GameDTO> getGamesByCategory(Integer categoryId) {
-        if (categoryId <= 0) {
-            throw new IllegalArgumentException("El ID de la categoría debe ser mayor que cero.");
-        }
-
-        boolean categoryExists = gameRepository.categoryExistsRaw(categoryId)==1 ? true : false;
+    public List<GameDTO> getGamesByCategory(String categoryName) {
+        boolean categoryExists = gameRepository.categoryExistsRaw(categoryName)==1 ? true : false;
 
         if(!categoryExists){
-            throw new EntityNotFoundException(String.format("La categoría con ID: %s no existe", categoryId));
+            throw new EntityNotFoundException(String.format("La categoría con '%s' no existe", categoryName));
         }
 
-        List<GameDTO> games = gameRepository.findGamesByCategoryId(categoryId).stream()
+        List<GameDTO> games = gameRepository.findGamesByCategoryName(categoryName).stream()
         .map(this::toResponse)
         .collect(Collectors.toList());
 

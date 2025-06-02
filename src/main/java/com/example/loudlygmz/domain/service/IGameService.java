@@ -9,6 +9,6 @@ public interface IGameService {
     List<GameDTO> getGames();
     GameDTO getGameById(Integer id);
     GameDTO insertGame(Game game);
-    List<GameDTO> getGamesByCategory(Integer id);
+    List<GameDTO> getGamesByCategory(String categoryName);
     List<GameDTO> getListOfGamesById(List<Integer> idList);
 }
