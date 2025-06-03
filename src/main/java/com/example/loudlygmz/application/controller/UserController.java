@@ -2,6 +2,7 @@ package com.example.loudlygmz.application.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
     
     private final UserOrchestrator userOrchestrator;
@@ -35,5 +37,5 @@ public class UserController {
         return ResponseEntity.ok(
             ApiResponse.success(HttpStatus.OK.value(), "Usuario encontrado", user)
         );
-    }
+    }  
 }

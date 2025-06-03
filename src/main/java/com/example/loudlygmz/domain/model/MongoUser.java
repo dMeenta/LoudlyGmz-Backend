@@ -19,8 +19,12 @@ public class MongoUser {
     private String id;
 
     private List<JoinedCommunity> joinedCommunities;
-    private List<String> friendIds;
+    private List<String> friendshipRequests;
+    private List<String> sentFriendshipRequests;
+    private List<Friend> friendsList;
     private List<String> chatIds;
 
     public record JoinedCommunity(Integer gameId, Instant joinedAt) {}
+
+    public record Friend(String friendUsername, Instant friendsSince){}
 }

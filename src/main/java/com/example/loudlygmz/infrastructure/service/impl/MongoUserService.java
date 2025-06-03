@@ -6,10 +6,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.loudlygmz.application.exception.AlreadyFriendsException;
+import com.example.loudlygmz.application.exception.DuplicateFriendshipRequestException;
+import com.example.loudlygmz.application.exception.SelfFriendshipException;
 import com.example.loudlygmz.application.exception.UserAlreadyExistsException;
 import com.example.loudlygmz.domain.model.MongoUser;
 import com.example.loudlygmz.domain.model.MongoUser.JoinedCommunity;
 import com.example.loudlygmz.domain.repository.IMongoUserRepository;
+import com.example.loudlygmz.domain.service.IFriendsService;
 import com.example.loudlygmz.domain.service.IMongoUserService;
 import com.mongodb.DuplicateKeyException;
 
@@ -18,7 +22,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @Service
-public class MongoUserService implements IMongoUserService{
+public class MongoUserService implements IMongoUserService, IFriendsService{
 
     private final IMongoUserRepository mongoUserRepository;
 
@@ -34,7 +38,9 @@ public class MongoUserService implements IMongoUserService{
         MongoUser user = new MongoUser();
         user.setId(username);
         user.setJoinedCommunities(new ArrayList<>());
-        user.setFriendIds(new ArrayList<>());
+        user.setFriendshipRequests(new ArrayList<>());
+        user.setSentFriendshipRequests(new ArrayList<>());
+        user.setFriendsList(new ArrayList<>());
         user.setChatIds(new ArrayList<>());
         try {
             return mongoUserRepository.insert(user);
@@ -58,5 +64,79 @@ public class MongoUserService implements IMongoUserService{
         user.getJoinedCommunities().removeIf(c -> c.gameId().equals(gameId));
         mongoUserRepository.save(user);
     }
+
+    @Override
+    public void sendFriendshipRequest(String requesterUsername, String targetUsername) {
+        MongoUser sender = getUserByUsername(requesterUsername);
+        MongoUser receiver = getUserByUsername(targetUsername);
+
+        validateFriendshipRequest(sender, receiver);
+
+        addSentFriendshipRequest(sender, receiver.getId());
+        addReceivedFriendshipRequest(receiver, sender.getId());
+    }
+
+    @Override
+    public void validateFriendshipRequest(MongoUser sender, MongoUser receiver) {
+        if (sender.getId().equals(receiver.getId())) {
+            throw new SelfFriendshipException();
+        }
+        if (sender.getSentFriendshipRequests().contains(receiver.getId())) {
+            throw new DuplicateFriendshipRequestException();
+        }
+        if (sender.getFriendsList().stream()
+        .anyMatch(f -> f.friendUsername().equals(receiver.getId()))) {
+            throw new AlreadyFriendsException();
+        }
+    }
+
+    @Override
+    public void addReceivedFriendshipRequest(MongoUser receiver, String senderUsername) {
+        receiver.getFriendshipRequests().add(senderUsername);
+        mongoUserRepository.save(receiver);
+    }
+    @Override
+    public void removeReceivedFriendshipRequest(MongoUser receiver, String senderUsername) {
+        receiver.getSentFriendshipRequests().remove(senderUsername);
+        mongoUserRepository.save(receiver);
+    }
     
+    @Override
+    public void addSentFriendshipRequest(MongoUser sender, String receiverUsername) {
+        sender.getSentFriendshipRequests().add(receiverUsername);
+        mongoUserRepository.save(sender);
+    }
+
+    @Override
+    public void removeSentFriendRequest(MongoUser sender, String receiverUsername) {
+        sender.getSentFriendshipRequests().remove(receiverUsername);
+        mongoUserRepository.save(sender);        
+    }
+
+    @Override
+    public void rejectFriendshipRequest(String rejecterUsername, String rejectedUsername) {
+        MongoUser rejecter = getUserByUsername(rejecterUsername);
+        MongoUser rejected = getUserByUsername(rejectedUsername);
+
+        rejecter.getFriendshipRequests().remove(rejected.getId());
+        rejected.getSentFriendshipRequests().remove(rejecter.getId());
+
+        mongoUserRepository.save(rejecter);
+        mongoUserRepository.save(rejected);
+    }
+
+    @Override
+    public void acceptFriendshipRequest(String accepterUsername, String acceptedUsername) {
+        MongoUser accepter = getUserByUsername(accepterUsername);
+        MongoUser accepted = getUserByUsername(acceptedUsername);
+
+        accepter.getFriendsList().add(new MongoUser.Friend(accepted.getId(), Instant.now()));
+        accepted.getFriendsList().add(new MongoUser.Friend(accepter.getId(), Instant.now()));
+
+        accepter.getFriendshipRequests().remove(accepted.getId());
+        accepted.getSentFriendshipRequests().remove(accepter.getId());
+
+        mongoUserRepository.save(accepter);
+        mongoUserRepository.save(accepted);
+    }
 }

@@ -29,7 +29,9 @@ public class UserOrchestrator {
             msqlUser.getProfilePicture(),
             msqlUser.getRole(),
             mongoUser.getJoinedCommunities(),
-            mongoUser.getFriendIds(),
+            mongoUser.getFriendshipRequests(),
+            mongoUser.getSentFriendshipRequests(),
+            mongoUser.getFriendsList(),
             mongoUser.getChatIds(),
             msqlUser.getCreationDate());
     }
@@ -45,7 +47,9 @@ public class UserOrchestrator {
             msqlUser.getProfilePicture(),
             msqlUser.getRole(),
             mongoUser.getJoinedCommunities(),
-            mongoUser.getFriendIds(),
+            mongoUser.getFriendshipRequests(),
+            mongoUser.getSentFriendshipRequests(),
+            mongoUser.getFriendsList(),
             mongoUser.getChatIds(),
             msqlUser.getCreationDate());
     }
