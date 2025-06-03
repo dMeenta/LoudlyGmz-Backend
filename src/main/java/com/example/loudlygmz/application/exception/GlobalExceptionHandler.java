@@ -89,6 +89,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(FriendshipException.class)
+    public ResponseEntity<ApiResponse<String>> handleFriendshipException(FriendshipException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null));
+
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneral(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
