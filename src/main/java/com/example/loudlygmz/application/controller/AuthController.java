@@ -13,7 +13,6 @@ import com.example.loudlygmz.application.dto.user.LoginRequestDTO;
 import com.example.loudlygmz.domain.service.IAuthService;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -25,10 +24,6 @@ public class AuthController {
 
     private final IAuthService authService;
 
-    @Operation(
-        summary = "Log-in API",
-        description = "Rest API for users to log in LoudlyGmz"
-    )
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequestDTO request) {
         LoginResponse response = authService.login(request);

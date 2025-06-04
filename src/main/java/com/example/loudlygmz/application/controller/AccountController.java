@@ -12,18 +12,12 @@ import com.example.loudlygmz.application.dto.user.UserResponse;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 import com.example.loudlygmz.infrastructure.orchestrator.AccountOrchestrator;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
-@Tag(
-    name = "REST APIs for Accounts in LoudlyGmz"
-)
 @RestController
 @RequestMapping(value = "/api/accounts", produces = {MediaType.APPLICATION_JSON_VALUE})
 @RequiredArgsConstructor
@@ -32,10 +26,6 @@ public class AccountController {
 
     private final AccountOrchestrator accountOrchestrator;
 
-    @Operation(
-        summary = "Register User API",
-        description = "Rest API to register a new User into LoudlyGmz"
-    )
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequestDTO request) {
         UserResponse response = accountOrchestrator.registerUser(request);
