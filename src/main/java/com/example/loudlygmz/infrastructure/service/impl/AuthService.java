@@ -40,7 +40,7 @@ public class AuthService implements IAuthService {
             FirebaseToken decoded = FirebaseAuth.getInstance().verifyIdToken(idToken);
             return decoded.getUid();
         } catch (Exception e) {
-            throw new RuntimeException("Token inválido o expirado");
+            throw new RuntimeException("Invalid or expired Token");
         }
     }
 }
