@@ -1,8 +1,6 @@
 package com.example.loudlygmz.infrastructure.websockets;
 
-import java.time.Instant;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
@@ -12,17 +10,16 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.example.loudlygmz.application.dto.chats.ChatMessageDTO;
+import com.example.loudlygmz.application.dto.chats.ChatMessageResponseDTO;
 import com.example.loudlygmz.application.dto.user.UserResponse;
 import com.example.loudlygmz.domain.model.ChatMessage;
 import com.example.loudlygmz.domain.repository.IChatRepository;
-import com.example.loudlygmz.infrastructure.common.ChatUtils;
+import com.example.loudlygmz.infrastructure.common.ChatMessageMapper;
+import com.example.loudlygmz.infrastructure.common.ChatMessageMapper.ValidationException;
 import com.example.loudlygmz.infrastructure.orchestrator.UserOrchestrator;
 import com.example.loudlygmz.infrastructure.service.impl.AuthService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,8 +31,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
   private final IChatRepository chatRepository;
   private final UserOrchestrator userOrchestrator;
   private final AuthService authService;
-  
-  private final Validator validator;
+
+  private final ChatMessageMapper chatMessageMapper;
 
   private final ObjectMapper objectMapper;
   private final Map<String, WebSocketSession> activeSessions = new ConcurrentHashMap<>();
@@ -51,15 +48,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
       activeSessions.put(uid, session);
       sessionUidMap.put(session.getId(), uid);
+      log.info("WebSocket connection established for user UID: {}", uid);
     } catch (Exception e) {
       log.error("Connection rejected: {}", e.getMessage(), e);
         try {
-            session.sendMessage(new TextMessage("Connection rejected: " + e.getMessage()));
-            session.close(CloseStatus.BAD_DATA);
+          safelySendMessage(session, "Connection rejected: " + e.getMessage());
+          session.close(CloseStatus.BAD_DATA);
         } catch (Exception ignored) {}
     }
-    
-
   }
 
   @Override
@@ -67,58 +63,35 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     try {
       String uid = sessionUidMap.get(session.getId());
       if(uid == null){
-        session.sendMessage(new TextMessage("Unauthorized."));
-        session.close();
+        rejectUnauthorized(session);
         return;
       }
       
       UserResponse senderUser = userOrchestrator.getUserByUid(uid);
       
-      try {
-        ChatMessageDTO dto = objectMapper.readValue(messageText.getPayload(), ChatMessageDTO.class);
+      ChatMessageDTO dto = parseAndValidateDTO(session, messageText.getPayload());
+      if (dto==null) return;
 
-        Set<ConstraintViolation<ChatMessageDTO>> violations = validator.validate(dto);
-        if(!violations.isEmpty()){
-          String errorMssg = violations.stream()
-            .map(ConstraintViolation::getMessage)
-            .findFirst()
-            .orElse("Invalid input.");
-          session.sendMessage(new TextMessage("Validation error: " + errorMssg));
-          return;
-        }
+      boolean isTheSameUser = uid.equals(dto.getReceiver());
 
-        boolean areFriends = senderUser.getFriendsList().stream()
-        .anyMatch(f -> f.friendUid().equals(dto.getReceiver()));
+      if(isTheSameUser){
+        safelySendMessage(session, "You can not chat with yourself.");
+        return;
+      }
       
-        if(!areFriends){
-          session.sendMessage(new TextMessage("You only can chat with your friends!"));
-          return;
-        }
-
-        ChatMessage message = buildMessage(uid, dto);
-
-        chatRepository.save(message);
-
-        WebSocketSession receiverSession = activeSessions.get(message.getReceiver());
-        if(receiverSession != null && receiverSession.isOpen()){
-          String json = objectMapper.writeValueAsString(message);
-          receiverSession.sendMessage(new TextMessage(json));
-        }
-      } catch (JsonProcessingException jsonEx){
-        log.warn("Error parsing JSON: {}", jsonEx.getOriginalMessage());
-        session.sendMessage(new TextMessage("Invalid message format. Review the JSON sent"));
+      if(!areFriends(senderUser, dto.getReceiver())){
+        safelySendMessage(session, "You only can chat with your friends!");
+        return;
       }
-       catch (Exception e) {
-        log.error("Unexpected error at message handling", e);
-        session.sendMessage(new TextMessage("An unexpected error occurred."));
-      }
+
+      ChatMessage message = chatMessageMapper.buildMessage(uid, dto);
+
+      chatRepository.save(message);
+
+      sendMessageToReceiver(message);
     } catch (Exception ex) {
       log.error("WebSocket error while handling message: {}", ex.getMessage(), ex);
-      try {
-        session.sendMessage(new TextMessage("Error: " + ex.getMessage()));
-      } catch (Exception ignored) {
-        log.warn("Failed to send error message to client", ignored);
-      }
+      safelySendMessage(session, "Error: " + ex.getMessage());
     }
   }
 
@@ -127,6 +100,17 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     String uid = sessionUidMap.remove(session.getId());
     if(uid != null){
       activeSessions.remove(uid);
+      log.info("WebSocket connection closed for UID: {}", uid);
+    }
+  }
+
+  // ============ Utility Methods ===============
+
+  private void safelySendMessage(WebSocketSession session, String message) {
+    try {
+      session.sendMessage(new TextMessage(message));
+    } catch (Exception e) {
+      log.warn("Failed to send error message to client", e);
     }
   }
 
@@ -138,13 +122,41 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     return query.replace("idToken=", "");
   }
 
-  private ChatMessage buildMessage(String sender, ChatMessageDTO dto){
-    return ChatMessage.builder()
-      .sender(sender)
-      .receiver(dto.getReceiver())
-      .content(dto.getContent())
-      .timestamp(Instant.now())
-      .chatId(ChatUtils.buildChatId(sender, dto.getReceiver()))
-      .build();
+  private void rejectUnauthorized(WebSocketSession session) throws Exception{
+    safelySendMessage(session, "Unauthorized.");
+    session.close();
   }
+
+  private ChatMessageDTO parseAndValidateDTO(WebSocketSession session, String payload){
+    try {
+      ChatMessageDTO dto = chatMessageMapper.parseAndValidate(payload, objectMapper);
+      log.info("Parsed and validated ChatMessageDTO: {}", dto);
+      return dto;
+    } catch (ValidationException vex){
+      safelySendMessage(session, "Validation error:" + vex.getMessage());
+      log.error("Validation error: {}", vex.getMessage());
+      return null;
+    }
+  }
+
+  private boolean areFriends(UserResponse sender, String receiverUid){
+    return sender.getFriendsList().stream().anyMatch(f->f.friendUid().equals(receiverUid));
+  }
+
+  private void sendMessageToReceiver(ChatMessage message){
+    WebSocketSession receiverSession = activeSessions.get(message.getReceiver());
+    if(receiverSession != null && receiverSession.isOpen()){
+      try {
+        ChatMessageResponseDTO responseDTO = chatMessageMapper.toResponseDTO(message);
+        String json = objectMapper.writeValueAsString(responseDTO);
+        safelySendMessage(receiverSession, json);
+        log.info("Message sent to receiver {} via WebSocket.", message.getReceiver());
+      } catch (Exception e) {
+        log.warn("Failed to send message to receiver {}", message.getReceiver(), e);
+      }
+    } else {
+      log.info("Receiver {} is offline. Message stored in database.", message.getReceiver());
+    }
+  }
+
 }
