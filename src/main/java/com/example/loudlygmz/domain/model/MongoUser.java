@@ -18,6 +18,7 @@ public class MongoUser {
     @Id
     private String id;
 
+    private String username;
     private List<JoinedCommunity> joinedCommunities;
     private List<String> friendshipRequests;
     private List<String> sentFriendshipRequests;
@@ -26,5 +27,5 @@ public class MongoUser {
 
     public record JoinedCommunity(Integer gameId, Instant joinedAt) {}
 
-    public record Friend(String friendUsername, Instant friendsSince){}
+    public record Friend(String friendUid, Instant friendsSince){}
 }

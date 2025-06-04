@@ -21,7 +21,7 @@ public class UserOrchestrator {
     public UserResponse createUser(RegisterRequestDTO request, String uid){
         
         MsqlUser msqlUser = msqlUserService.createUser(uid, request);
-        MongoUser mongoUser = mongoUserService.createUser(request.getUsername());
+        MongoUser mongoUser = mongoUserService.createUser(uid, request.getUsername());
 
         return new UserResponse(
             msqlUser.getUsername(),
@@ -40,6 +40,23 @@ public class UserOrchestrator {
         
         MsqlUser msqlUser = msqlUserService.getMsqlUserByUsername(username);
         MongoUser mongoUser = mongoUserService.getUserByUsername(username);
+
+        return new UserResponse(
+            msqlUser.getUsername(),
+            msqlUser.getBiography(),
+            msqlUser.getProfilePicture(),
+            msqlUser.getRole(),
+            mongoUser.getJoinedCommunities(),
+            mongoUser.getFriendshipRequests(),
+            mongoUser.getSentFriendshipRequests(),
+            mongoUser.getFriendsList(),
+            mongoUser.getChatIds(),
+            msqlUser.getCreationDate());
+    }
+
+    public UserResponse getUserByUid(String uid){
+        MsqlUser msqlUser = msqlUserService.getMsqlUserByUid(uid);
+        MongoUser mongoUser = mongoUserService.getUserByUsername(msqlUser.getUsername());
 
         return new UserResponse(
             msqlUser.getUsername(),

@@ -3,7 +3,7 @@ package com.example.loudlygmz.domain.service;
 import com.example.loudlygmz.domain.model.MongoUser;
 
 public interface IMongoUserService {
-    MongoUser createUser(String username);
+    MongoUser createUser(String uid, String username);
     MongoUser getUserByUsername(String username);
 
     //Community

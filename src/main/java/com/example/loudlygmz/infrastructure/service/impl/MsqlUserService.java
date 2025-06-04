@@ -38,5 +38,13 @@ public class MsqlUserService implements IMsqlUserService {
         return msqUserlRepository.findByUsername(username)
         .orElseThrow(() -> new EntityNotFoundException(
             String.format("El usuario con username '%s' no existe en la base de datos", username)));
-    }   
+    }
+
+    @Override
+    public MsqlUser getMsqlUserByUid(String uid) {
+        return msqUserlRepository.findById(uid)
+        .orElseThrow(()-> new EntityNotFoundException(
+            String.format("No se encontró el usuario con el id '%s' en la base de datos", uid)
+        ));
+    }
 }

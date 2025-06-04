@@ -6,4 +6,5 @@ import com.example.loudlygmz.domain.model.MsqlUser;
 public interface IMsqlUserService {
     MsqlUser createUser(String uid, RegisterRequestDTO request);
     MsqlUser getMsqlUserByUsername(String username);
+    MsqlUser getMsqlUserByUid(String uid);
 }

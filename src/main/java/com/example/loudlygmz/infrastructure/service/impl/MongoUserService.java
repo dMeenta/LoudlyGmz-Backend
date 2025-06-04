@@ -28,15 +28,16 @@ public class MongoUserService implements IMongoUserService, IFriendsService{
 
     @Override
     public MongoUser getUserByUsername(String username) {
-        return mongoUserRepository.findById(username)
+        return mongoUserRepository.findByUsername(username)
         .orElseThrow(() -> new EntityNotFoundException(
             String.format("El usuario con username '%s' no existe en la base de datos", username)));
     }
 
     @Override
-    public MongoUser createUser(String username){
+    public MongoUser createUser(String uid, String username){
         MongoUser user = new MongoUser();
-        user.setId(username);
+        user.setId(uid);
+        user.setUsername(username);
         user.setJoinedCommunities(new ArrayList<>());
         user.setFriendshipRequests(new ArrayList<>());
         user.setSentFriendshipRequests(new ArrayList<>());
@@ -85,7 +86,7 @@ public class MongoUserService implements IMongoUserService, IFriendsService{
             throw new DuplicateFriendshipRequestException();
         }
         if (sender.getFriendsList().stream()
-        .anyMatch(f -> f.friendUsername().equals(receiver.getId()))) {
+        .anyMatch(f -> f.friendUid().equals(receiver.getId()))) {
             throw new AlreadyFriendsException();
         }
     }
