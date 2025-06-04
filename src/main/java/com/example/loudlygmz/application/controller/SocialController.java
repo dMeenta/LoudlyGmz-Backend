@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.loudlygmz.application.dto.AcceptFriendshipRequestDTO;
-import com.example.loudlygmz.application.dto.RejectFriendshipRequestDTO;
-import com.example.loudlygmz.application.dto.SendFriendshipRequestDTO;
+import com.example.loudlygmz.application.dto.friendship.AcceptFriendshipRequestDTO;
+import com.example.loudlygmz.application.dto.friendship.RejectFriendshipRequestDTO;
+import com.example.loudlygmz.application.dto.friendship.SendFriendshipRequestDTO;
 import com.example.loudlygmz.domain.service.IFriendsService;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 
