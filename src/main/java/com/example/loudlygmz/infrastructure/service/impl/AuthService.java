@@ -7,6 +7,8 @@ import com.example.loudlygmz.application.dto.auth.LoginResponse;
 import com.example.loudlygmz.application.dto.user.LoginRequestDTO;
 import com.example.loudlygmz.domain.service.IAuthService;
 import com.example.loudlygmz.infrastructure.firebase.FirebaseAuthClient;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,5 +33,14 @@ public class AuthService implements IAuthService {
         Long expiresIn = Long.parseLong(firebaseData.getExpiresIn());
 
         return new LoginResponse(uid, idToken, refreshToken, expiresIn);
+    }
+
+    public String verifyIdToken(String idToken){
+        try {
+            FirebaseToken decoded = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            return decoded.getUid();
+        } catch (Exception e) {
+            throw new RuntimeException("Token inválido o expirado");
+        }
     }
 }
