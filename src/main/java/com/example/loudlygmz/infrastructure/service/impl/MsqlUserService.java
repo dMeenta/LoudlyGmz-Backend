@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.example.loudlygmz.application.dto.user.RegisterRequestDTO;
 import com.example.loudlygmz.domain.enums.Role;
 import com.example.loudlygmz.domain.model.MsqlUser;
-import com.example.loudlygmz.domain.repository.IMsqUserlRepository;
+import com.example.loudlygmz.domain.repository.IMsqUserRepository;
 import com.example.loudlygmz.domain.service.IMsqlUserService;
 import com.example.loudlygmz.infrastructure.common.SanitizationUtils;
 
@@ -16,7 +16,7 @@ import lombok.AllArgsConstructor;
 @Service
 public class MsqlUserService implements IMsqlUserService {
 
-    private final IMsqUserlRepository msqUserlRepository;
+    private final IMsqUserRepository msqUserlRepository;
 
     @Override
     public MsqlUser createUser(String uid, RegisterRequestDTO request) {
