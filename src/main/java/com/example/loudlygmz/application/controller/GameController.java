@@ -12,6 +12,10 @@ import com.example.loudlygmz.application.dto.game.GameDTO;
 import com.example.loudlygmz.domain.service.IGameService;
 import com.example.loudlygmz.infrastructure.common.ApiResponse;
 import com.example.loudlygmz.infrastructure.orchestrator.GameOrchestrator;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +25,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
+@Tag(
+    name = "Games Controller",
+    description = "Controller for the management of games on LoudlyGmz MySQL database"
+)
 @RestController
 @RequestMapping("/api/games")
 @RequiredArgsConstructor
@@ -30,6 +38,14 @@ public class GameController {
     private final GameOrchestrator gameOrchestrator;
     private final IGameService gameService;
 
+    @Operation(
+        summary = "List all Games endpoint",
+        description = "Endpoint to List All Games registered on msql database"
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = "Http Status OK"
+    )
     @GetMapping
     public ResponseEntity<ApiResponse<List<GameDTO>>> getGames() {
         return ResponseEntity.ok(
@@ -39,8 +55,16 @@ public class GameController {
                 gameService.getGames()));
     }
 
+    @Operation(
+        summary = "Get a Game By ID endpoint",
+        description = "Get a game data by its ID"
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = "Http Status OK"
+    )
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<GameDTO>> getGameById(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<GameDTO>> getGameById(@Schema(example = "1") @PathVariable Integer id) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK.value(),
@@ -48,8 +72,17 @@ public class GameController {
                 gameService.getGameById(id)));
     }            
     
+    @Operation(
+        summary = "List All Games By Their Category endpoint",
+        description = "Endpoint to List All Games that match with the category name received"
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = "Http Status OK"
+    )
     @GetMapping("/category/{categoryName}")
-    public ResponseEntity<ApiResponse<List<GameDTO>>> getGamesByCategory(@PathVariable String categoryName) {
+    public ResponseEntity<ApiResponse<List<GameDTO>>> getGamesByCategory(@Schema(example = "metroidvania")
+        @PathVariable String categoryName) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK.value(),
@@ -57,7 +90,14 @@ public class GameController {
                 gameService.getGamesByCategory(categoryName)));
     }
 
-
+    @Operation(
+        summary = "Insert a new a Game",
+        description = "System verified if you are admin o not, Only ADMINS can register a new game"
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "201",
+        description = "Http Status CREATED"
+    )
     @PostMapping("/insert")
     public ResponseEntity<ApiResponse<GameDTO>> insertGame(@Valid @RequestBody GameDTO game){
         return ResponseEntity.status(HttpStatus.CREATED).body(

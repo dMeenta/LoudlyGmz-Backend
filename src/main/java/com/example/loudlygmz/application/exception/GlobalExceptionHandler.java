@@ -96,6 +96,16 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUnauthorizedException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+            ApiResponse.error(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Token invalido o usuario no autenticado.",
+                ex.getMessage())
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneral(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(

@@ -1,5 +1,7 @@
 package com.example.loudlygmz.infrastructure.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.application.dto.user.RegisterRequestDTO;
@@ -46,5 +48,10 @@ public class MsqlUserService implements IMsqlUserService {
         .orElseThrow(()-> new EntityNotFoundException(
             String.format("No se encontró el usuario con el id '%s' en la base de datos", uid)
         ));
+    }
+
+    @Override
+    public List<MsqlUser> getAllMsqlUserByUid(List<String> listOfUids) {
+        return msqUserlRepository.findAllById(listOfUids);
     }
 }

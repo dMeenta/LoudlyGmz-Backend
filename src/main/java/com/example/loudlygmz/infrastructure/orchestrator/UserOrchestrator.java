@@ -1,11 +1,19 @@
 package com.example.loudlygmz.infrastructure.orchestrator;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
+import com.example.loudlygmz.application.dto.user.FriendResponseDTO;
+import com.example.loudlygmz.application.dto.user.MinimalUserResponseDTO;
 import com.example.loudlygmz.application.dto.user.RegisterRequestDTO;
 import com.example.loudlygmz.application.dto.user.UserResponse;
 import com.example.loudlygmz.domain.model.MongoUser;
 import com.example.loudlygmz.domain.model.MsqlUser;
+import com.example.loudlygmz.domain.model.MongoUser.Friend;
 import com.example.loudlygmz.domain.service.IMongoUserService;
 import com.example.loudlygmz.domain.service.IMsqlUserService;
 
@@ -69,5 +77,41 @@ public class UserOrchestrator {
             mongoUser.getFriendsList(),
             mongoUser.getChatIds(),
             msqlUser.getCreationDate());
+    }
+
+    public MinimalUserResponseDTO getMinimalInfoOfCurrentUser(String uid){
+        MsqlUser msqlUser = msqlUserService.getMsqlUserByUid(uid);
+
+        return new MinimalUserResponseDTO(
+            msqlUser.getUsername(),
+            msqlUser.getProfilePicture(),
+            msqlUser.getRole());
+    }
+
+    public List<FriendResponseDTO> getFriendsList(String loggedUsername, int offset, int limit) {
+        MongoUser userLogged = mongoUserService.getUserByUsername(loggedUsername);
+
+        List<Friend> allFriends = userLogged.getFriendsList();
+        
+        // Asegura que offset + limit no excedan
+        int end = Math.min(offset + limit, allFriends.size());
+        if (offset > end) return List.of(); // fuera de rango
+
+        List<Friend> paginated = allFriends.subList(offset, end);
+
+        List<String> friendUids = paginated.stream()
+            .map(Friend::friendUid)
+            .toList();
+
+        Map<String, MsqlUser> userMap = msqlUserService.getAllMsqlUserByUid(friendUids).stream()
+            .collect(Collectors.toMap(MsqlUser::getUid, Function.identity()));
+
+        return paginated.stream().map(f -> {
+            MsqlUser u = userMap.get(f.friendUid());
+            return new FriendResponseDTO(
+                f.friendUid(),
+                u.getUsername(),
+                u.getProfilePicture()
+            );}).toList();
     }
 }
