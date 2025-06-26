@@ -10,7 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.example.loudlygmz.infrastructure.common.ApiResponse;
+import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 import com.google.firebase.auth.FirebaseAuthException;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -19,9 +19,9 @@ import jakarta.persistence.EntityNotFoundException;
 public class GlobalExceptionHandler {
     
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ApiResponse<Object>> handleNotFound(EntityNotFoundException ex){
+    public ResponseEntity<ResponseDTO<Object>> handleNotFound(EntityNotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-            ApiResponse.error(
+            ResponseDTO.error(
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
                 null)
@@ -29,16 +29,16 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponse<Object>> handleIllegalArgument(IllegalArgumentException ex) {
+    public ResponseEntity<ResponseDTO<Object>> handleIllegalArgument(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(
-            ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null)
+            ResponseDTO.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null)
         );
     }
 
     @ExceptionHandler(FirebaseAuthException.class)
-    public ResponseEntity<ApiResponse<Object>> handleFirebaseError(FirebaseAuthException ex) {
+    public ResponseEntity<ResponseDTO<Object>> handleFirebaseError(FirebaseAuthException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-            ApiResponse.error(
+            ResponseDTO.error(
                 HttpStatus.BAD_REQUEST.value(),
                 "Error de Firebase",
                 ex.getMessage())
@@ -46,13 +46,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ResponseDTO<Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
         String errorMessage = ex.getBindingResult().getFieldErrors().stream()
             .map(error -> error.getField() + ": " + error.getDefaultMessage())
             .collect(Collectors.joining("; "));
 
         return ResponseEntity.badRequest().body(
-            ApiResponse.error(
+            ResponseDTO.error(
                 HttpStatus.BAD_REQUEST.value(),
                 "Validación fallida",
                 errorMessage
@@ -61,9 +61,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ApiResponse<Object>> handleInvalidCredentials(InvalidCredentialsException ex) {
+    public ResponseEntity<ResponseDTO<Object>> handleInvalidCredentials(InvalidCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-        ApiResponse.error(
+        ResponseDTO.error(
             HttpStatus.UNAUTHORIZED.value(),
             ex.getMessage(),
             null
@@ -71,17 +71,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DataAccessException.class)
-    public ResponseEntity<ApiResponse<Object>> handleDataAccess(DataAccessException ex) {
+    public ResponseEntity<ResponseDTO<Object>> handleDataAccess(DataAccessException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-            ApiResponse.error(
+            ResponseDTO.error(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Error al acceder a la base de datos",
                 ex.getMostSpecificCause().getMessage()));
     }
 
     @ExceptionHandler(CategoryValidationException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleCategoryValidationException(CategoryValidationException ex) {
-        ApiResponse<Map<String, String>> response = ApiResponse.error(
+    public ResponseEntity<ResponseDTO<Map<String, String>>> handleCategoryValidationException(CategoryValidationException ex) {
+        ResponseDTO<Map<String, String>> response = ResponseDTO.error(
             HttpStatus.NOT_FOUND.value(),
             ex.getMessage(),
             ex.getValidationMap()
@@ -90,16 +90,16 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(FriendshipException.class)
-    public ResponseEntity<ApiResponse<String>> handleFriendshipException(FriendshipException ex){
+    public ResponseEntity<ResponseDTO<String>> handleFriendshipException(FriendshipException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null));
+        .body(ResponseDTO.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null));
 
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ApiResponse<Object>> handleUnauthorizedException(Exception ex) {
+    public ResponseEntity<ResponseDTO<Object>> handleUnauthorizedException(Exception ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-            ApiResponse.error(
+            ResponseDTO.error(
                 HttpStatus.UNAUTHORIZED.value(),
                 "Token invalido o usuario no autenticado.",
                 ex.getMessage())
@@ -107,9 +107,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Object>> handleGeneral(Exception ex) {
+    public ResponseEntity<ResponseDTO<Object>> handleGeneral(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-            ApiResponse.error(
+            ResponseDTO.error(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Error inesperado",
                 ex.getMessage())

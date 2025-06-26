@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.loudlygmz.application.dto.game.GameDTO;
 import com.example.loudlygmz.domain.service.IGameService;
-import com.example.loudlygmz.infrastructure.common.ApiResponse;
+import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 import com.example.loudlygmz.infrastructure.orchestrator.GameOrchestrator;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,9 +47,9 @@ public class GameController {
         description = "Http Status OK"
     )
     @GetMapping
-    public ResponseEntity<ApiResponse<List<GameDTO>>> getGames() {
+    public ResponseEntity<ResponseDTO<List<GameDTO>>> getGames() {
         return ResponseEntity.ok(
-            ApiResponse.success(
+            ResponseDTO.success(
                 HttpStatus.OK.value(),
                 "Juegos obtenidos",
                 gameService.getGames()));
@@ -64,9 +64,9 @@ public class GameController {
         description = "Http Status OK"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<GameDTO>> getGameById(@Schema(example = "1") @PathVariable Integer id) {
+    public ResponseEntity<ResponseDTO<GameDTO>> getGameById(@Schema(example = "1") @PathVariable Integer id) {
         return ResponseEntity.ok(
-            ApiResponse.success(
+            ResponseDTO.success(
                 HttpStatus.OK.value(),
                 "Juego encontrado",
                 gameService.getGameById(id)));
@@ -81,10 +81,10 @@ public class GameController {
         description = "Http Status OK"
     )
     @GetMapping("/category/{categoryName}")
-    public ResponseEntity<ApiResponse<List<GameDTO>>> getGamesByCategory(@Schema(example = "metroidvania")
+    public ResponseEntity<ResponseDTO<List<GameDTO>>> getGamesByCategory(@Schema(example = "metroidvania")
         @PathVariable String categoryName) {
         return ResponseEntity.ok(
-            ApiResponse.success(
+            ResponseDTO.success(
                 HttpStatus.OK.value(),
                 "Juegos obtenidos por su categoría",
                 gameService.getGamesByCategory(categoryName)));
@@ -99,9 +99,9 @@ public class GameController {
         description = "Http Status CREATED"
     )
     @PostMapping("/insert")
-    public ResponseEntity<ApiResponse<GameDTO>> insertGame(@Valid @RequestBody GameDTO game){
+    public ResponseEntity<ResponseDTO<GameDTO>> insertGame(@Valid @RequestBody GameDTO game){
         return ResponseEntity.status(HttpStatus.CREATED).body(
-            ApiResponse.success(
+            ResponseDTO.success(
                 HttpStatus.CREATED.value(),
                 "Juego registrado correctamente.",
                 gameOrchestrator.insertGame(game)));

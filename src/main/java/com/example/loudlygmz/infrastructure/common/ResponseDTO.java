@@ -8,19 +8,19 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApiResponse<T> {
+public class ResponseDTO<T> {
     private int statusCode;
     private boolean success;
     private String message;
     private T data;
 
     // Constructor para respuestas exitosas
-    public static <T> ApiResponse<T> success(int statusCode, String message, T data) {
-        return new ApiResponse<>(statusCode, true, message, data);
+    public static <T> ResponseDTO<T> success(int statusCode, String message, T data) {
+        return new ResponseDTO<>(statusCode, true, message, data);
     }
 
     // Constructor para respuestas de error
-    public static <T> ApiResponse<T> error(int statusCode, String message, T data) {
-        return new ApiResponse<>(statusCode, false, message, data);
+    public static <T> ResponseDTO<T> error(int statusCode, String message, T data) {
+        return new ResponseDTO<>(statusCode, false, message, data);
     }
 }

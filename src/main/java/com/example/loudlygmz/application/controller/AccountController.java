@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.loudlygmz.application.dto.user.RegisterRequestDTO;
 import com.example.loudlygmz.application.dto.user.UserResponse;
-import com.example.loudlygmz.infrastructure.common.ApiResponse;
+import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 import com.example.loudlygmz.infrastructure.orchestrator.AccountOrchestrator;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,9 +41,9 @@ public class AccountController {
         description = "Http Status CREATED"
     )
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequestDTO request) {
+    public ResponseEntity<ResponseDTO<UserResponse>> register(@Valid @RequestBody RegisterRequestDTO request) {
         UserResponse response = accountOrchestrator.registerUser(request);
-        return ResponseEntity.ok(ApiResponse.success(
+        return ResponseEntity.ok(ResponseDTO.success(
             HttpStatus.CREATED.value(),
             "Usuario registrado correctamente",
             response));

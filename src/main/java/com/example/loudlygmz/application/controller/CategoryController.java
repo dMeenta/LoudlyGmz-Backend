@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.loudlygmz.application.dto.category.CategoryResponse;
 import com.example.loudlygmz.domain.service.ICategoryService;
-import com.example.loudlygmz.infrastructure.common.ApiResponse;
+import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,9 +38,9 @@ public class CategoryController {
         description = "Http Status OK"
     )
     @GetMapping()
-    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategories() {
+    public ResponseEntity<ResponseDTO<List<CategoryResponse>>> getCategories() {
         return ResponseEntity.ok(
-            ApiResponse.success(
+            ResponseDTO.success(
                 HttpStatus.OK.value(),
                 "Categorías obtenidas.",
                 categoryService.getCategories())
@@ -56,9 +56,9 @@ public class CategoryController {
         description = "Http Status OK"
     )
     @GetMapping("/{categoryName}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryByName(@Schema(example = "acción") @PathVariable String categoryName) {
+    public ResponseEntity<ResponseDTO<CategoryResponse>> getCategoryByName(@Schema(example = "acción") @PathVariable String categoryName) {
         return ResponseEntity.ok(
-            ApiResponse.success(
+            ResponseDTO.success(
                 HttpStatus.OK.value(),
                 "Categoría encontrada.",
                 categoryService.getCategoryByName(categoryName))

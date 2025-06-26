@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.loudlygmz.application.dto.community.CommunityMembershipRequest;
 import com.example.loudlygmz.application.dto.community.CommunityMembershipResponse;
-import com.example.loudlygmz.infrastructure.common.ApiResponse;
+import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 import com.example.loudlygmz.infrastructure.orchestrator.CommunityOrchestrator;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,10 +37,10 @@ public class CommunityController {
         description = "Http Status OK"
     )
     @PostMapping("/join")
-    public ResponseEntity<ApiResponse<CommunityMembershipResponse>> joinCommunity(@Valid @RequestBody CommunityMembershipRequest request) {
+    public ResponseEntity<ResponseDTO<CommunityMembershipResponse>> joinCommunity(@Valid @RequestBody CommunityMembershipRequest request) {
         CommunityMembershipResponse response = communityOrchestrator.joinCommunity(request.getUserId(), request.getGameId());
         return ResponseEntity.ok(
-            ApiResponse.success(
+            ResponseDTO.success(
                 HttpStatus.OK.value(),
                 response.getMessage(),
                 response));
@@ -55,10 +55,10 @@ public class CommunityController {
         description = "Http Status OK"
     )
     @PostMapping("/leave")
-    public ResponseEntity<ApiResponse<CommunityMembershipResponse>> leaveCommunity(@RequestBody CommunityMembershipRequest request) {
+    public ResponseEntity<ResponseDTO<CommunityMembershipResponse>> leaveCommunity(@RequestBody CommunityMembershipRequest request) {
         CommunityMembershipResponse response = communityOrchestrator.leaveCommunity(request.getUserId(), request.getGameId());
         return ResponseEntity.ok(
-            ApiResponse.success(
+            ResponseDTO.success(
                 HttpStatus.OK.value(),
                 response.getMessage(),
                 response));
