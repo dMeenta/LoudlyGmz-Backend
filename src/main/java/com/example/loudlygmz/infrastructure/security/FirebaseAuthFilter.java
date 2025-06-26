@@ -3,6 +3,7 @@ package com.example.loudlygmz.infrastructure.security;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,6 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @Component
+@Order(1)
 @AllArgsConstructor
 public class FirebaseAuthFilter extends OncePerRequestFilter {
   private final FirebaseAuth firebaseAuth;

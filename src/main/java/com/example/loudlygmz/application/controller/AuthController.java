@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.loudlygmz.application.dto.auth.LoginResponse;
 import com.example.loudlygmz.application.dto.user.LoginRequestDTO;
 import com.example.loudlygmz.domain.service.IAuthService;
-import com.example.loudlygmz.infrastructure.common.ApiResponse;
+import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,21 +43,21 @@ public class AuthController {
         description = "Http Status OK"
     )
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequestDTO request,
+    public ResponseEntity<ResponseDTO<LoginResponse>> login(@Valid @RequestBody LoginRequestDTO request,
     HttpServletResponse servletResponse) {
         LoginResponse response = authService.login(request);
 
         ResponseCookie cookie = ResponseCookie.from("session", response.getIdToken())
             .httpOnly(true)
-            .secure(false)
+            .secure(true)
             .path("/")
             .maxAge(Duration.ofSeconds(response.getExpiresIn()))
-            .sameSite("strict")
+            .sameSite("None")
             .build();
 
         servletResponse.addHeader("Set-Cookie", cookie.toString());
 
-        return ResponseEntity.ok(ApiResponse.success(
+        return ResponseEntity.ok(ResponseDTO.success(
             HttpStatus.OK.value(),
             "Inicio de sesión exitoso",
             response));

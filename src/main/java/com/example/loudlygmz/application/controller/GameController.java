@@ -70,7 +70,7 @@ public class GameController {
                 HttpStatus.OK.value(),
                 "Juego encontrado",
                 gameService.getGameById(id)));
-    }            
+    }
     
     @Operation(
         summary = "List All Games By Their Category endpoint",
