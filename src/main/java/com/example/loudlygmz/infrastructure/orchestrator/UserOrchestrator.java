@@ -88,7 +88,7 @@ public class UserOrchestrator {
             msqlUser.getRole());
     }
 
-    public List<FriendResponseDTO> getFriendsList(String loggedUsername, int offset, int limit) {
+    public List<FriendResponseDTO> getUserFriendsList(String loggedUsername, int offset, int limit) {
         MongoUser userLogged = mongoUserService.getUserByUsername(loggedUsername);
 
         List<Friend> allFriends = userLogged.getFriendsList();

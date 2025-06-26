@@ -1,5 +1,7 @@
 package com.example.loudlygmz.application.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.loudlygmz.application.dto.community.CommunityMembershipRequest;
 import com.example.loudlygmz.application.dto.community.CommunityMembershipResponse;
+import com.example.loudlygmz.application.dto.community.UserCommunityDTO;
+import com.example.loudlygmz.domain.model.MsqlUser;
+import com.example.loudlygmz.infrastructure.common.AuthUtils;
 import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 import com.example.loudlygmz.infrastructure.orchestrator.CommunityOrchestrator;
 
@@ -16,6 +21,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Tag(
     name = "Community Controller",
@@ -61,6 +69,19 @@ public class CommunityController {
             ResponseDTO.success(
                 HttpStatus.OK.value(),
                 response.getMessage(),
+                response));
+    }
+
+    @GetMapping("/userLogged")
+    public ResponseEntity<ResponseDTO<List<UserCommunityDTO>>> getUserGameCommunities(
+        @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue="10") int limit
+    ) {
+        MsqlUser currentUser = AuthUtils.getCurrentUser();
+        List<UserCommunityDTO> response = communityOrchestrator.getUserLoggedCommunities(currentUser.getUsername(), offset, limit);
+        return ResponseEntity.ok(
+            ResponseDTO.success(
+                HttpStatus.OK.value(),
+                "Comunidades del usuario listadas",
                 response));
     }
 

@@ -57,15 +57,15 @@ public class UserController {
     }
 
     @GetMapping("/friends")
-    public ResponseEntity<ResponseDTO<List<FriendResponseDTO>>> getFriendsList(
+    public ResponseEntity<ResponseDTO<List<FriendResponseDTO>>> getUserFriendsList(
         @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int limit
     ) {
         MsqlUser currentUser = AuthUtils.getCurrentUser();
-        List<FriendResponseDTO> friends = userOrchestrator.getFriendsList(currentUser.getUsername(), offset, limit);
-    return ResponseEntity.ok(
-        ResponseDTO.success(HttpStatus.OK.value(),
-        "Amigos retornados correctamente",
-        friends));
-    }
+        List<FriendResponseDTO> friends = userOrchestrator.getUserFriendsList(currentUser.getUsername(), offset, limit);
+        return ResponseEntity.ok(
+            ResponseDTO.success(HttpStatus.OK.value(),
+            "Amigos retornados correctamente",
+            friends));
+    } 
 
 }

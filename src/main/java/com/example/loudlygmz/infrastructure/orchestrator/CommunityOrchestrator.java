@@ -1,14 +1,17 @@
 package com.example.loudlygmz.infrastructure.orchestrator;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.application.dto.community.CommunityMembershipResponse;
+import com.example.loudlygmz.application.dto.community.UserCommunityDTO;
 import com.example.loudlygmz.application.dto.game.GameDTO;
 import com.example.loudlygmz.application.dto.user.UserResponse;
 import com.example.loudlygmz.domain.enums.CommunityAction;
+import com.example.loudlygmz.domain.model.MongoUser.JoinedCommunity;
 import com.example.loudlygmz.infrastructure.service.impl.GameService;
 
 import lombok.RequiredArgsConstructor;
@@ -72,4 +75,30 @@ public class CommunityOrchestrator {
             object.game().getName(),
             Instant.now());
     }
+
+    public List<UserCommunityDTO> getUserLoggedCommunities(String username, int offset, int limit){
+        UserResponse userLogged = userOrchestrator.getUserByUsername(username);
+        
+        List<JoinedCommunity> userCommunities = userLogged.getJoinedCommunities();
+        
+        // Asegura que offset + limit no excedan
+        int end = Math.min(offset + limit, userCommunities.size());
+        if (offset > end) return List.of(); // fuera de rango
+
+        List<JoinedCommunity> paginatedCommunities = userCommunities.subList(offset, end);
+
+        List<UserCommunityDTO> response = paginatedCommunities.stream()
+        .map(gc -> {
+            GameDTO game = gameService.getGameById(gc.gameId());
+            return UserCommunityDTO.builder()
+            .id(gc.gameId())
+            .card(game.getCard())
+            .name(game.getName())
+            .memberSince(gc.joinedAt())
+            .build();
+        }).toList();
+
+        return response;
+    }
 }
+
