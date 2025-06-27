@@ -1,6 +1,7 @@
 package com.example.loudlygmz.domain.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,4 +15,6 @@ public interface IGameRepository extends JpaRepository<Game, Integer> {
 
     @Query(value = "SELECT EXISTS (SELECT 1 FROM categories WHERE name = :categoryName)", nativeQuery = true)
     int categoryExistsRaw(@Param("categoryName") String categoryName);
+
+    Optional<Game> findByName(String name);
 }

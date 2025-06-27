@@ -63,7 +63,7 @@ public class GameController {
         responseCode = "200",
         description = "Http Status OK"
     )
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<ResponseDTO<GameDTO>> getGameById(@Schema(example = "1") @PathVariable Integer id) {
         return ResponseEntity.ok(
             ResponseDTO.success(
@@ -105,6 +105,15 @@ public class GameController {
                 HttpStatus.CREATED.value(),
                 "Juego registrado correctamente.",
                 gameOrchestrator.insertGame(game)));
+    }
+
+    @GetMapping("/{gameName}")
+    public ResponseEntity<ResponseDTO<GameDTO>> getGameByName(@Schema(example = "League Of Legends") @PathVariable String gameName) {
+        return ResponseEntity.ok(
+            ResponseDTO.success(
+                HttpStatus.OK.value(),
+                "Juego encontrado",
+                gameService.getGameByName(gameName)));
     }
 
 }

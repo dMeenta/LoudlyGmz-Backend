@@ -8,6 +8,7 @@ import com.example.loudlygmz.domain.model.Game;
 public interface IGameService {
     List<GameDTO> getGames();
     GameDTO getGameById(Integer id);
+    GameDTO getGameByName(String gameName);
     GameDTO insertGame(Game game);
     List<GameDTO> getGamesByCategory(String categoryName);
     List<GameDTO> getListOfGamesById(List<Integer> idList);

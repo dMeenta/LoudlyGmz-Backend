@@ -39,6 +39,13 @@ public class GameService implements IGameService {
     }
 
     @Override
+    public GameDTO getGameByName(String gameName) {
+        return gameRepository.findByName(gameName).map(this::toResponse)
+        .orElseThrow(() -> new EntityNotFoundException(
+            String.format("Juego con nombre: %s no encontrado", gameName)));
+    }
+
+    @Override
     public List<GameDTO> getGamesByCategory(String categoryName) {
         boolean categoryExists = gameRepository.categoryExistsRaw(categoryName)==1 ? true : false;
 
