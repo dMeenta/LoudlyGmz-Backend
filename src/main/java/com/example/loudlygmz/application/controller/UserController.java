@@ -2,6 +2,7 @@ package com.example.loudlygmz.application.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -43,6 +44,15 @@ public class UserController {
         UserResponse user = userOrchestrator.getUserByUsername(username);
         return ResponseEntity.ok(
             ResponseDTO.success(HttpStatus.OK.value(), "Usuario encontrado", user));
+    }
+
+    @GetMapping()
+    public ResponseEntity<ResponseDTO<Page<MinimalUserResponseDTO>>> getAllUsers(
+        @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int limit) {
+        MsqlUser currentUser = AuthUtils.getCurrentUser();
+        Page<MinimalUserResponseDTO> usersList = userOrchestrator.getUsersExcludingCurrentAndFriends(currentUser.getUsername(), offset, limit);
+        return ResponseEntity.ok(
+            ResponseDTO.success(HttpStatus.OK.value(), "Usuarios listados correctamente", usersList));
     }
 
     @GetMapping("/me")

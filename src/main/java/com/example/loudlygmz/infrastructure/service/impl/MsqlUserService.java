@@ -2,12 +2,14 @@ package com.example.loudlygmz.infrastructure.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.application.dto.user.RegisterRequestDTO;
 import com.example.loudlygmz.domain.enums.Role;
 import com.example.loudlygmz.domain.model.MsqlUser;
-import com.example.loudlygmz.domain.repository.IMsqUserRepository;
+import com.example.loudlygmz.domain.repository.IMsqlUserRepository;
 import com.example.loudlygmz.domain.service.IMsqlUserService;
 import com.example.loudlygmz.infrastructure.common.SanitizationUtils;
 
@@ -18,7 +20,7 @@ import lombok.AllArgsConstructor;
 @Service
 public class MsqlUserService implements IMsqlUserService {
 
-    private final IMsqUserRepository msqUserlRepository;
+    private final IMsqlUserRepository msqUserlRepository;
 
     @Override
     public MsqlUser createUser(String uid, RegisterRequestDTO request) {
@@ -54,4 +56,9 @@ public class MsqlUserService implements IMsqlUserService {
     public List<MsqlUser> getAllMsqlUserByUid(List<String> listOfUids) {
         return msqUserlRepository.findAllById(listOfUids);
     }
+
+    @Override
+    public Page<MsqlUser> findAllExcludingIds(List<String> excludedIds, Pageable pageable) {
+        return msqUserlRepository.findAllExcludingIds(excludedIds, pageable);
+    }    
 }

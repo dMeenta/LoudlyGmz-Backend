@@ -1,10 +1,14 @@
 package com.example.loudlygmz.infrastructure.orchestrator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.application.dto.user.FriendResponseDTO;
@@ -113,5 +117,26 @@ public class UserOrchestrator {
                 u.getUsername(),
                 u.getProfilePicture()
             );}).toList();
+    }
+
+    public Page<MinimalUserResponseDTO> getUsersExcludingCurrentAndFriends(String username, int offset, int limit) {
+        MongoUser mongoUser = mongoUserService.getUserByUsername(username); // Faltaba ';'
+
+        List<String> friendUids = mongoUser.getFriendsList().stream()
+            .map(MongoUser.Friend::friendUid)
+            .toList();
+
+        List<String> excludedIds = new ArrayList<>();
+        excludedIds.add(mongoUser.getId()); // uid del loggeado
+        excludedIds.addAll(friendUids);
+
+        Pageable pageable = PageRequest.of(offset, limit);
+
+        Page<MsqlUser> usersPage = msqlUserService.findAllExcludingIds(excludedIds, pageable);
+
+        return usersPage.map(user -> new MinimalUserResponseDTO(
+            user.getUsername(),
+            user.getProfilePicture(),
+            user.getRole()));
     }
 }
