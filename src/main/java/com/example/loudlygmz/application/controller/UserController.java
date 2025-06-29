@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.loudlygmz.application.dto.user.FriendResponseDTO;
 import com.example.loudlygmz.application.dto.user.MinimalUserResponseDTO;
 import com.example.loudlygmz.application.dto.user.UserResponse;
+import com.example.loudlygmz.application.dto.user.UserWithRelationshipDTO;
 import com.example.loudlygmz.domain.model.MsqlUser;
 import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 import com.example.loudlygmz.infrastructure.common.AuthUtils;
@@ -36,7 +37,7 @@ public class UserController {
     private final UserOrchestrator userOrchestrator;
 
     @GetMapping("/{username}")
-    public ResponseEntity<ResponseDTO<UserResponse>> getUserByUsername(@PathVariable @Valid
+    public ResponseEntity<ResponseDTO<UserResponse>> getProfile(@PathVariable @Valid
     @Size(min = 5, max = 30, message = "The length of the username should be between 5 and 30")
     @Pattern(regexp = "^[^\\s]+$", message = "Username must not contain spaces")
     @NotBlank(message = "A username is needed to search into LoudlyGmz")
@@ -46,11 +47,23 @@ public class UserController {
             ResponseDTO.success(HttpStatus.OK.value(), "Usuario encontrado", user));
     }
 
+    @GetMapping("/user/{usernameSearched}")
+    public ResponseEntity<ResponseDTO<UserWithRelationshipDTO>> getUserByUsername(@PathVariable @Valid
+    @Size(min = 5, max = 30, message = "The length of the username should be between 5 and 30")
+    @Pattern(regexp = "^[^\\s]+$", message = "Username must not contain spaces")
+    @NotBlank(message = "A username is needed to search into LoudlyGmz")
+    String usernameSearched) {
+        String currentUser = AuthUtils.getCurrentUser().getUsername();
+        UserWithRelationshipDTO user = userOrchestrator.getUserByUsername(currentUser, usernameSearched);
+        return ResponseEntity.ok(
+            ResponseDTO.success(HttpStatus.OK.value(), "Usuario encontrado", user));
+    }
+
     @GetMapping()
-    public ResponseEntity<ResponseDTO<Page<MinimalUserResponseDTO>>> getAllUsers(
+    public ResponseEntity<ResponseDTO<Page<UserWithRelationshipDTO>>> getAllUsers(
         @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int limit) {
         MsqlUser currentUser = AuthUtils.getCurrentUser();
-        Page<MinimalUserResponseDTO> usersList = userOrchestrator.getUsersExcludingCurrentAndFriends(currentUser.getUsername(), offset, limit);
+        Page<UserWithRelationshipDTO> usersList = userOrchestrator.getUsersExcludingCurrentAndFriends(currentUser.getUsername(), offset, limit);
         return ResponseEntity.ok(
             ResponseDTO.success(HttpStatus.OK.value(), "Usuarios listados correctamente", usersList));
     }
@@ -76,6 +89,17 @@ public class UserController {
             ResponseDTO.success(HttpStatus.OK.value(),
             "Amigos retornados correctamente",
             friends));
-    } 
+    }
+
+    @GetMapping("/friend-request")
+    public ResponseEntity<ResponseDTO<Page<UserWithRelationshipDTO>>> getFriendRequests(@RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "5") int limit
+    ) {
+        String userLogged = AuthUtils.getCurrentUser().getUsername();
+        Page<UserWithRelationshipDTO> page = userOrchestrator.getFriendRequests(userLogged, offset, limit);
+        return ResponseEntity.ok(
+        ResponseDTO.success(HttpStatus.OK.value(),
+        "Friendship requests listed.",
+        page));
+    }
 
 }
