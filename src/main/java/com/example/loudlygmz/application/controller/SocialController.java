@@ -15,7 +15,6 @@ import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-
 @RestController
 @RequestMapping("/api/social")
 @RequiredArgsConstructor
@@ -34,6 +33,16 @@ public class SocialController {
       String.format("'%s' sent a friend request to '%s'.", userLogged, receiverUsername)));
   }
 
+  @PostMapping("/friend-request/cancel")
+  public ResponseEntity<ResponseDTO<String>> cancelFriendshipRequest(@Valid @RequestBody String cancelledUsername) {
+    String userLogged = AuthUtils.getCurrentUser().getUsername();
+    friendsService.cancelFriendshipRequest(userLogged, cancelledUsername);
+    return ResponseEntity.ok(
+      ResponseDTO.success(HttpStatus.OK.value(),
+      "Friendship request cancelled.",
+      String.format("You cancelled the friend request to '%s'.", cancelledUsername)));
+  }
+  
   @PostMapping("/friend-request/accept")
   public ResponseEntity<ResponseDTO<String>> acceptFriendshipRequest(@Valid String acceptedUsername) {
     String userLogged = AuthUtils.getCurrentUser().getUsername();
