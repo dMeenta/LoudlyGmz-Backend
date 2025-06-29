@@ -13,5 +13,6 @@ public interface IMsqlUserService {
     MsqlUser getMsqlUserByUsername(String username);
     MsqlUser getMsqlUserByUid(String uid);
     List<MsqlUser> getAllMsqlUserByUid(List<String> listOfUids);
+    Page<MsqlUser> findUsersByIdIn(List<String> listOfUids, Pageable pageable);
     Page<MsqlUser> findAllExcludingIds(List<String> excludedIds, Pageable pageable);
 }

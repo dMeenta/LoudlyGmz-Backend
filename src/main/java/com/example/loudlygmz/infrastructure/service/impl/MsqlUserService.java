@@ -60,5 +60,10 @@ public class MsqlUserService implements IMsqlUserService {
     @Override
     public Page<MsqlUser> findAllExcludingIds(List<String> excludedIds, Pageable pageable) {
         return msqUserlRepository.findAllExcludingIds(excludedIds, pageable);
+    }
+
+    @Override
+    public Page<MsqlUser> findUsersByIdIn(List<String> listOfUids, Pageable pageable) {
+        return msqUserlRepository.findByUidIn(listOfUids, pageable);
     }    
 }
