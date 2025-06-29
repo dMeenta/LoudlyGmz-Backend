@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import com.example.loudlygmz.application.dto.user.FriendResponseDTO;
 import com.example.loudlygmz.application.dto.user.MinimalUserResponseDTO;
 import com.example.loudlygmz.application.dto.user.RegisterRequestDTO;
 import com.example.loudlygmz.application.dto.user.UserResponse;
+import com.example.loudlygmz.application.dto.user.UserWithRelationshipDTO;
+import com.example.loudlygmz.domain.enums.FriendshipStatus;
 import com.example.loudlygmz.domain.model.MongoUser;
 import com.example.loudlygmz.domain.model.MsqlUser;
 import com.example.loudlygmz.domain.model.MongoUser.Friend;
@@ -64,6 +67,17 @@ public class UserOrchestrator {
             mongoUser.getFriendsList(),
             mongoUser.getChatIds(),
             msqlUser.getCreationDate());
+    }
+
+    public UserWithRelationshipDTO getUserByUsername(String userLogged, String usernameSearched){
+        String searchedUserProfilePicture = msqlUserService.getMsqlUserByUsername(usernameSearched).getProfilePicture();
+        String searchedUserId = msqlUserService.getMsqlUserByUsername(usernameSearched).getUid();
+        MongoUser currentUser = mongoUserService.getUserByUsername(userLogged);
+
+        return new UserWithRelationshipDTO(
+                usernameSearched,
+                searchedUserProfilePicture,
+                getRelationshipStatus(searchedUserId, currentUser));
     }
 
     public UserResponse getUserByUid(String uid){
@@ -119,24 +133,60 @@ public class UserOrchestrator {
             );}).toList();
     }
 
-    public Page<MinimalUserResponseDTO> getUsersExcludingCurrentAndFriends(String username, int offset, int limit) {
-        MongoUser mongoUser = mongoUserService.getUserByUsername(username); // Faltaba ';'
+    public Page<UserWithRelationshipDTO> getUsersExcludingCurrentAndFriends(String usernameLogged, int offset, int limit) {
+        MongoUser userLogged = mongoUserService.getUserByUsername(usernameLogged);
 
-        List<String> friendUids = mongoUser.getFriendsList().stream()
+        List<String> friendUids = userLogged.getFriendsList().stream()
             .map(MongoUser.Friend::friendUid)
             .toList();
 
         List<String> excludedIds = new ArrayList<>();
-        excludedIds.add(mongoUser.getId()); // uid del loggeado
+        excludedIds.add(userLogged.getId()); // uid del loggeado
         excludedIds.addAll(friendUids);
 
         Pageable pageable = PageRequest.of(offset, limit);
 
         Page<MsqlUser> usersPage = msqlUserService.findAllExcludingIds(excludedIds, pageable);
 
-        return usersPage.map(user -> new MinimalUserResponseDTO(
-            user.getUsername(),
-            user.getProfilePicture(),
-            user.getRole()));
+        return usersPage.map(user -> {
+            String targetUserId = user.getUid();
+            return new UserWithRelationshipDTO(
+                user.getUsername(),
+                user.getProfilePicture(),
+                getRelationshipStatus(targetUserId, userLogged));
+            });
+    }
+
+    private FriendshipStatus getRelationshipStatus(String targetUserId, MongoUser currentUser){
+        List<String> sentRequests = currentUser.getSentFriendshipRequests();
+        List<String> receivedRequests = currentUser.getFriendshipRequests();
+        List<String> friendUids = currentUser.getFriendsList().stream().map(Friend::friendUid).toList();
+
+        FriendshipStatus status;
+        if (sentRequests.contains(targetUserId)) {
+            status = FriendshipStatus.PENDING_SENT;
+        } else if (receivedRequests.contains(targetUserId)) {
+            status = FriendshipStatus.PENDING_RECEIVED;
+        } else if (friendUids.contains(targetUserId)){
+            status = FriendshipStatus.FRIENDS;
+        } else {
+            status = FriendshipStatus.NONE;
+        }
+        return status;
+    }
+
+    public Page<UserWithRelationshipDTO> getFriendRequests(String usernameLogged, int offset, int limit){
+        MongoUser userLogged = mongoUserService.getUserByUsername(usernameLogged);
+
+        List<String> userIds = userLogged.getFriendshipRequests();
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+
+        Page<MsqlUser> usersPage = msqlUserService.findUsersByIdIn(userIds, pageable);
+
+        List<UserWithRelationshipDTO> users = usersPage.getContent().stream()
+        .map(user -> new UserWithRelationshipDTO(user.getUsername(), user.getProfilePicture(), FriendshipStatus.PENDING_RECEIVED))
+        .toList();
+
+        return new PageImpl<>(users, pageable, usersPage.getTotalElements());
     }
 }
