@@ -92,25 +92,25 @@ public class MongoUserService implements IMongoUserService, IFriendsService{
     }
 
     @Override
-    public void addReceivedFriendshipRequest(MongoUser receiver, String senderUsername) {
-        receiver.getFriendshipRequests().add(senderUsername);
+    public void addReceivedFriendshipRequest(MongoUser receiver, String senderId) {
+        receiver.getFriendshipRequests().add(senderId);
         mongoUserRepository.save(receiver);
     }
     @Override
-    public void removeReceivedFriendshipRequest(MongoUser receiver, String senderUsername) {
-        receiver.getSentFriendshipRequests().remove(senderUsername);
+    public void removeReceivedFriendshipRequest(MongoUser receiver, String senderId) {
+        receiver.getFriendshipRequests().remove(senderId);
         mongoUserRepository.save(receiver);
     }
     
     @Override
-    public void addSentFriendshipRequest(MongoUser sender, String receiverUsername) {
-        sender.getSentFriendshipRequests().add(receiverUsername);
+    public void addSentFriendshipRequest(MongoUser sender, String receiverId) {
+        sender.getSentFriendshipRequests().add(receiverId);
         mongoUserRepository.save(sender);
     }
 
     @Override
-    public void removeSentFriendRequest(MongoUser sender, String receiverUsername) {
-        sender.getSentFriendshipRequests().remove(receiverUsername);
+    public void removeSentFriendRequest(MongoUser sender, String receiverId) {
+        sender.getSentFriendshipRequests().remove(receiverId);
         mongoUserRepository.save(sender);        
     }
 
@@ -119,11 +119,8 @@ public class MongoUserService implements IMongoUserService, IFriendsService{
         MongoUser rejecter = getUserByUsername(rejecterUsername);
         MongoUser rejected = getUserByUsername(rejectedUsername);
 
-        rejecter.getFriendshipRequests().remove(rejected.getId());
-        rejected.getSentFriendshipRequests().remove(rejecter.getId());
-
-        mongoUserRepository.save(rejecter);
-        mongoUserRepository.save(rejected);
+        removeReceivedFriendshipRequest(rejecter, rejected.getId());
+        removeSentFriendRequest(rejected, rejecter.getId());
     }
 
     @Override
@@ -134,10 +131,16 @@ public class MongoUserService implements IMongoUserService, IFriendsService{
         accepter.getFriendsList().add(new MongoUser.Friend(accepted.getId(), Instant.now()));
         accepted.getFriendsList().add(new MongoUser.Friend(accepter.getId(), Instant.now()));
 
-        accepter.getFriendshipRequests().remove(accepted.getId());
-        accepted.getSentFriendshipRequests().remove(accepter.getId());
+        removeReceivedFriendshipRequest(accepter, accepted.getId());
+        removeSentFriendRequest(accepted, accepter.getId());
+    }
 
-        mongoUserRepository.save(accepter);
-        mongoUserRepository.save(accepted);
+    @Override
+    public void cancelFriendshipRequest(String cancellerUsername, String cancelledUsername) {
+        MongoUser canceller = getUserByUsername(cancellerUsername);
+        MongoUser cancelled = getUserByUsername(cancelledUsername);
+
+        removeReceivedFriendshipRequest(cancelled, canceller.getId());
+        removeSentFriendRequest(canceller, cancelled.getId());
     }
 }
