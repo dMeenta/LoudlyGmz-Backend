@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.loudlygmz.application.dto.chats.ChatMessageDTO;
 import com.example.loudlygmz.application.dto.chats.ChatMessageResponseDTO;
+import com.example.loudlygmz.application.dto.user.UserMessagerInfo;
 import com.example.loudlygmz.domain.model.ChatMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,13 +38,13 @@ public class ChatMessageMapper {
     }
   }
 
-  public ChatMessage buildMessage(String sender, ChatMessageDTO dto){
+  public ChatMessage buildMessage(UserMessagerInfo senderInfo, UserMessagerInfo receiverInfo, String content){
     return ChatMessage.builder()
-      .sender(sender)
-      .receiver(dto.getReceiver())
-      .content(dto.getContent())
+      .sender(senderInfo.getUsername())
+      .receiver(receiverInfo.getUsername())
+      .content(content)
       .timestamp(Instant.now())
-      .chatId(ChatUtils.buildChatId(sender, dto.getReceiver()))
+      .chatId(ChatUtils.buildChatId(senderInfo.getUid(), receiverInfo.getUid()))
       .build();
   }
 

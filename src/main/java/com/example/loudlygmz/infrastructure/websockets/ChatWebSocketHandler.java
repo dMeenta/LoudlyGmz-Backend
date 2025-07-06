@@ -11,9 +11,11 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.example.loudlygmz.application.dto.chats.ChatMessageDTO;
 import com.example.loudlygmz.application.dto.chats.ChatMessageResponseDTO;
+import com.example.loudlygmz.application.dto.user.UserMessagerInfo;
 import com.example.loudlygmz.application.dto.user.UserResponse;
 import com.example.loudlygmz.domain.model.ChatMessage;
 import com.example.loudlygmz.domain.repository.IChatRepository;
+import com.example.loudlygmz.domain.service.IMongoUserService;
 import com.example.loudlygmz.infrastructure.common.ChatMessageMapper;
 import com.example.loudlygmz.infrastructure.common.ChatMessageMapper.ValidationException;
 import com.example.loudlygmz.infrastructure.orchestrator.UserOrchestrator;
@@ -30,12 +32,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
   private final IChatRepository chatRepository;
   private final UserOrchestrator userOrchestrator;
+  private final IMongoUserService mongoUserService;
   private final AuthService authService;
 
   private final ChatMessageMapper chatMessageMapper;
 
   private final ObjectMapper objectMapper;
-  private final Map<String, WebSocketSession> activeSessions = new ConcurrentHashMap<>();
+  private final Map<String, WebSocketSession> activeSessions = new ConcurrentHashMap<>(); // clave: username
+  private final Map<String, String> sessionUsernameMap = new ConcurrentHashMap<>(); // sessionId → username
   private final Map<String, String> sessionUidMap = new ConcurrentHashMap<>();
 
   @Override
@@ -44,11 +48,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
       String idToken = extractIdToken(session);
       String uid = authService.verifyIdToken(idToken);
 
-      userOrchestrator.getUserByUid(uid);
+      UserResponse user = userOrchestrator.getUserByUid(uid);
+      String username = user.getUsername();
 
-      activeSessions.put(uid, session);
+      activeSessions.put(username, session);
+      sessionUsernameMap.put(session.getId(), username);
       sessionUidMap.put(session.getId(), uid);
-      log.info("WebSocket connection established for user UID: {}", uid);
+      log.info("WebSocket connection established for user UID: {}", username);
     } catch (Exception e) {
       log.error("Connection rejected: {}", e.getMessage(), e);
         try {
@@ -72,19 +78,26 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
       ChatMessageDTO dto = parseAndValidateDTO(session, messageText.getPayload());
       if (dto==null) return;
 
-      boolean isTheSameUser = uid.equals(dto.getReceiver());
+      boolean isTheSameUser = senderUser.getUsername().equals(dto.getReceiverUsername());
 
       if(isTheSameUser){
         safelySendMessage(session, "You can not chat with yourself.");
         return;
       }
       
-      if(!areFriends(senderUser, dto.getReceiver())){
+      if(!areFriends(senderUser, dto.getReceiverUsername())){
         safelySendMessage(session, "You only can chat with your friends!");
         return;
       }
 
-      ChatMessage message = chatMessageMapper.buildMessage(uid, dto);
+      String receiverUid = mongoUserService.getUserByUsername(dto.getReceiverUsername()).getId();
+
+      UserMessagerInfo senderInfo = UserMessagerInfo.builder()
+      .uid(uid).username(senderUser.getUsername()).build();
+      UserMessagerInfo receiverInfo = UserMessagerInfo.builder()
+      .uid(receiverUid).username(dto.getReceiverUsername()).build();
+
+      ChatMessage message = chatMessageMapper.buildMessage(senderInfo, receiverInfo, dto.getContent());
 
       chatRepository.save(message);
 
@@ -97,10 +110,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
   @Override
   public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-    String uid = sessionUidMap.remove(session.getId());
-    if(uid != null){
-      activeSessions.remove(uid);
-      log.info("WebSocket connection closed for UID: {}", uid);
+    String username = sessionUsernameMap.remove(session.getId());
+    if(username != null){
+      activeSessions.remove(username);
+      log.info("WebSocket connection closed for username: {}", username);
     }
   }
 
@@ -115,11 +128,22 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
   }
 
   private String extractIdToken(WebSocketSession session) {
-    String query = session.getUri().getQuery();
-    if (query == null || !query.startsWith("idToken=")) {
-        throw new RuntimeException("Token not found on WebSocket connection.");
+    var cookies = session.getHandshakeHeaders().get("cookie");
+    if (cookies == null || cookies.isEmpty()) {
+        throw new RuntimeException("No cookies found in WebSocket connection.");
     }
-    return query.replace("idToken=", "");
+
+    for(String cookieHeader: cookies){
+      String[] cookiePairs = cookieHeader.split(";");
+      for(String pair: cookiePairs){
+        String[] keyValue = pair.trim().split("=", 2);
+        if(keyValue.length==2 && keyValue[0].equals("session")){
+          return keyValue[1];
+        }
+      }
+    }
+
+    throw new RuntimeException("Session cookie not found.");
   }
 
   private void rejectUnauthorized(WebSocketSession session) throws Exception{
@@ -139,7 +163,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
   }
 
-  private boolean areFriends(UserResponse sender, String receiverUid){
+  private boolean areFriends(UserResponse sender, String receiverUsername){
+    String receiverUid = mongoUserService.getUserByUsername(receiverUsername).getId();
     return sender.getFriendsList().stream().anyMatch(f->f.friendUid().equals(receiverUid));
   }
 

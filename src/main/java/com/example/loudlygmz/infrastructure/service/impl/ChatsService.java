@@ -1,7 +1,9 @@
 package com.example.loudlygmz.infrastructure.service.impl;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.domain.model.ChatMessage;
@@ -22,8 +24,9 @@ public class ChatsService implements IChatsService{
   }
 
   @Override
-  public List<ChatMessage> getMessagesByChatId(String chatId) {
-    return chatRepository.findByChatIdOrderByTimestampAsc(chatId);
+  public Page<ChatMessage> getMessagesByChatId(String chatId, int offset, int limit) {
+    Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("timestamp").descending());
+    return chatRepository.findByChatId(chatId, pageable);
   }
   
 }
