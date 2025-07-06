@@ -3,6 +3,8 @@ package com.example.loudlygmz.infrastructure.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.application.dto.game.GameDTO;
@@ -38,7 +40,11 @@ public class GameService implements IGameService {
                 String.format("Juego con ID: %s no encontrado", id)));
     }
 
-    @Override
+    public Game getGameByNameWithId(String gameName) {
+        return gameRepository.findByName(gameName).orElseThrow(() -> new EntityNotFoundException(
+            String.format("Juego con nombre: %s no encontrado", gameName)));
+    }
+
     public GameDTO getGameByName(String gameName) {
         return gameRepository.findByName(gameName).map(this::toResponse)
         .orElseThrow(() -> new EntityNotFoundException(
@@ -75,6 +81,11 @@ public class GameService implements IGameService {
     @Override
     public GameDTO insertGame(Game game) {
         return toResponse(gameRepository.save(game));
+    }
+
+    @Override
+    public Page<Game> getListOfGamesById(List<Integer> idList, Pageable pageable) {
+        return gameRepository.findByIdIn(idList, pageable);
     }
 
     private GameDTO toResponse(Game game) {
