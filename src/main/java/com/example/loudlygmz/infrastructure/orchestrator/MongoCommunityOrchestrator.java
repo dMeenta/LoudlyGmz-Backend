@@ -49,5 +49,11 @@ public class MongoCommunityOrchestrator {
         return Optional.empty();
     }
 
+    public boolean checkMembership(String username, Integer gameId){
+        MongoUser user = mongoUserService.getUserByUsername(username);
+
+        return user.getJoinedCommunities().stream().anyMatch(comm -> comm.gameId().equals(gameId));
+    }
+
 
 }

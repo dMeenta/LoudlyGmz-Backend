@@ -1,7 +1,6 @@
 package com.example.loudlygmz.application.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,10 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.loudlygmz.application.dto.community.CommunityMembershipRequest;
 import com.example.loudlygmz.application.dto.community.CommunityMembershipResponse;
 import com.example.loudlygmz.application.dto.community.UserCommunityDTO;
-import com.example.loudlygmz.domain.model.MsqlUser;
 import com.example.loudlygmz.infrastructure.common.AuthUtils;
 import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 import com.example.loudlygmz.infrastructure.orchestrator.CommunityOrchestrator;
@@ -22,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -34,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class CommunityController {
     
-    private final CommunityOrchestrator communityOrchestrator;
+    private final CommunityOrchestrator communityOrchestrator;    
 
     @Operation(
         summary = "Join a community endpoint",
@@ -45,8 +43,9 @@ public class CommunityController {
         description = "Http Status OK"
     )
     @PostMapping("/join")
-    public ResponseEntity<ResponseDTO<CommunityMembershipResponse>> joinCommunity(@Valid @RequestBody CommunityMembershipRequest request) {
-        CommunityMembershipResponse response = communityOrchestrator.joinCommunity(request.getUserId(), request.getGameId());
+    public ResponseEntity<ResponseDTO<CommunityMembershipResponse>> joinCommunity(@Valid @RequestBody String gameName) {
+        String usernameLogged = AuthUtils.getCurrentUser().getUsername();
+        CommunityMembershipResponse response = communityOrchestrator.joinCommunity(usernameLogged, gameName);
         return ResponseEntity.ok(
             ResponseDTO.success(
                 HttpStatus.OK.value(),
@@ -63,8 +62,9 @@ public class CommunityController {
         description = "Http Status OK"
     )
     @PostMapping("/leave")
-    public ResponseEntity<ResponseDTO<CommunityMembershipResponse>> leaveCommunity(@RequestBody CommunityMembershipRequest request) {
-        CommunityMembershipResponse response = communityOrchestrator.leaveCommunity(request.getUserId(), request.getGameId());
+    public ResponseEntity<ResponseDTO<CommunityMembershipResponse>> leaveCommunity(@RequestBody String gameName) {
+        String usernameLogged = AuthUtils.getCurrentUser().getUsername();
+        CommunityMembershipResponse response = communityOrchestrator.leaveCommunity(usernameLogged, gameName);
         return ResponseEntity.ok(
             ResponseDTO.success(
                 HttpStatus.OK.value(),
@@ -73,28 +73,25 @@ public class CommunityController {
     }
 
     @GetMapping("/userLogged")
-    public ResponseEntity<ResponseDTO<List<UserCommunityDTO>>> getUserGameCommunities(
+    public ResponseEntity<ResponseDTO<Page<UserCommunityDTO>>> getUserGameCommunities(
         @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue="10") int limit
     ) {
-        MsqlUser currentUser = AuthUtils.getCurrentUser();
-        List<UserCommunityDTO> response = communityOrchestrator.getUserLoggedCommunities(currentUser.getUsername(), offset, limit);
+        String userLogged = AuthUtils.getCurrentUser().getUsername();
+        Page<UserCommunityDTO> response = communityOrchestrator.getUserLoggedCommunities(userLogged, offset, limit);
         return ResponseEntity.ok(
             ResponseDTO.success(
                 HttpStatus.OK.value(),
-                "Comunidades del usuario listadas",
+                "User communities listed",
                 response));
     }
-
-    /*
     
-    @GetMapping("/isMember")
-    public ResponseEntity<?> checkMembership(@RequestParam String userId, @RequestParam Integer gameId) {
-        return communityService.checkMembership(userId, gameId);
+    @GetMapping("/is-community-member/{communityGameName}")
+    public ResponseEntity<ResponseDTO<Boolean>> checkMembership(@PathVariable String communityGameName) {
+        String usernameLogged = AuthUtils.getCurrentUser().getUsername();
+        boolean isMember = communityOrchestrator.checkMembership(usernameLogged, communityGameName);
+        return ResponseEntity.ok(
+        ResponseDTO.success(HttpStatus.OK.value(),
+        "Membership returned.",
+        isMember));
     }
-    
-    @GetMapping("/{uid}")
-    public ResponseEntity<?> getCommunitiesByUser(@PathVariable String uid) {
-        return communityService.getCommunitiesByUser(uid);
-    }
-     */
 }
