@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class FriendResponseDTO {
-  private String friendUid;
   private String friendUsername;
   private String friendProfilePicture;
 }

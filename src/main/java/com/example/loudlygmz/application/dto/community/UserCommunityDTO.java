@@ -8,7 +8,6 @@ import lombok.Data;
 @Builder
 @Data
 public class UserCommunityDTO {
-  private Integer id;
   private String name;
   private Instant memberSince;
   private String card;
