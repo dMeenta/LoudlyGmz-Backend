@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Validated
 public class SocialController {
-
   private final IFriendsService friendsService;
 
   @PostMapping("/friend-request/send")
@@ -44,7 +43,7 @@ public class SocialController {
   }
   
   @PostMapping("/friend-request/accept")
-  public ResponseEntity<ResponseDTO<String>> acceptFriendshipRequest(@Valid String acceptedUsername) {
+  public ResponseEntity<ResponseDTO<String>> acceptFriendshipRequest(@Valid @RequestBody String acceptedUsername) {
     String userLogged = AuthUtils.getCurrentUser().getUsername();
     friendsService.acceptFriendshipRequest(userLogged, acceptedUsername);
     return ResponseEntity.ok(
