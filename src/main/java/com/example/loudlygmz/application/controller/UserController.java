@@ -1,7 +1,5 @@
 package com.example.loudlygmz.application.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,20 +78,20 @@ public class UserController {
     }
 
     @GetMapping("/friends")
-    public ResponseEntity<ResponseDTO<List<FriendResponseDTO>>> getUserFriendsList(
-        @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int limit
+    public ResponseEntity<ResponseDTO<Page<FriendResponseDTO>>> getUserFriendsList(
+        @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "8") int limit
     ) {
-        MsqlUser currentUser = AuthUtils.getCurrentUser();
-        List<FriendResponseDTO> friends = userOrchestrator.getUserFriendsList(currentUser.getUsername(), offset, limit);
+        String userLogged = AuthUtils.getCurrentUser().getUsername();
+        Page<FriendResponseDTO> page = userOrchestrator.getUserFriendsList(userLogged, offset, limit);
         return ResponseEntity.ok(
             ResponseDTO.success(HttpStatus.OK.value(),
-            "Amigos retornados correctamente",
-            friends));
+            "Page of friends listed.",
+            page));
     }
 
     @GetMapping("/friend-request")
-    public ResponseEntity<ResponseDTO<Page<UserWithRelationshipDTO>>> getFriendRequests(@RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "5") int limit
-    ) {
+    public ResponseEntity<ResponseDTO<Page<UserWithRelationshipDTO>>> getFriendRequests(
+        @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "5") int limit) {
         String userLogged = AuthUtils.getCurrentUser().getUsername();
         Page<UserWithRelationshipDTO> page = userOrchestrator.getFriendRequests(userLogged, offset, limit);
         return ResponseEntity.ok(
