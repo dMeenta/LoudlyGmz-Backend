@@ -2,9 +2,6 @@ package com.example.loudlygmz.infrastructure.orchestrator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -70,12 +67,14 @@ public class UserOrchestrator {
     }
 
     public UserWithRelationshipDTO getUserByUsername(String userLogged, String usernameSearched){
-        String searchedUserProfilePicture = msqlUserService.getMsqlUserByUsername(usernameSearched).getProfilePicture();
-        String searchedUserId = msqlUserService.getMsqlUserByUsername(usernameSearched).getUid();
+        MsqlUser userSearched = msqlUserService.getMsqlUserByUsername(usernameSearched);
+        String responseUsername = userSearched.getUsername();
+        String searchedUserProfilePicture = userSearched.getProfilePicture();
+        String searchedUserId = userSearched.getUid();
         MongoUser currentUser = mongoUserService.getUserByUsername(userLogged);
 
         return new UserWithRelationshipDTO(
-                usernameSearched,
+                responseUsername,
                 searchedUserProfilePicture,
                 getRelationshipStatus(searchedUserId, currentUser));
     }
@@ -106,31 +105,21 @@ public class UserOrchestrator {
             msqlUser.getRole());
     }
 
-    public List<FriendResponseDTO> getUserFriendsList(String loggedUsername, int offset, int limit) {
-        MongoUser userLogged = mongoUserService.getUserByUsername(loggedUsername);
+    public Page<FriendResponseDTO> getUserFriendsList(String usernameLogged, int offset, int limit) {
+        MongoUser userLogged = mongoUserService.getUserByUsername(usernameLogged);
 
-        List<Friend> allFriends = userLogged.getFriendsList();
-        
-        // Asegura que offset + limit no excedan
-        int end = Math.min(offset + limit, allFriends.size());
-        if (offset > end) return List.of(); // fuera de rango
+        List<String> userIds = userLogged.getFriendsList()
+            .stream().map(f -> f.friendUid()).toList();
 
-        List<Friend> paginated = allFriends.subList(offset, end);
+        Pageable pageable = PageRequest.of(offset / limit, limit);
 
-        List<String> friendUids = paginated.stream()
-            .map(Friend::friendUid)
+        Page<MsqlUser> usersPage = msqlUserService.findUsersByIdIn(userIds, pageable);
+
+        List<FriendResponseDTO> friends = usersPage.getContent().stream()
+            .map(user -> new FriendResponseDTO(user.getUsername(), user.getProfilePicture()))
             .toList();
 
-        Map<String, MsqlUser> userMap = msqlUserService.getAllMsqlUserByUid(friendUids).stream()
-            .collect(Collectors.toMap(MsqlUser::getUid, Function.identity()));
-
-        return paginated.stream().map(f -> {
-            MsqlUser u = userMap.get(f.friendUid());
-            return new FriendResponseDTO(
-                f.friendUid(),
-                u.getUsername(),
-                u.getProfilePicture()
-            );}).toList();
+        return new PageImpl<>(friends, pageable, usersPage.getTotalElements());
     }
 
     public Page<UserWithRelationshipDTO> getUsersExcludingCurrentAndFriends(String usernameLogged, int offset, int limit) {
