@@ -104,15 +104,6 @@ public class DatabaseSeeder implements CommandLineRunner {
         .build();
 
         Game g7 = Game.builder()
-        .name("Counter-Strike: Global Offensive")
-        .description("Un icónico juego de disparos táctico en primera persona donde equipos de terroristas y antiterroristas compiten en misiones estratégicas.")
-        .release_date(LocalDate.parse("2012-08-21"))
-        .developer("Valve")
-        .assets(new GameAssets("", "", "", ""))
-        .categories(List.of(action, tacticalShooter, threeD))
-        .build();
-
-        Game g8 = Game.builder()
         .name("Warface")
         .description("Un FPS táctico con modos cooperativos y competitivos, ofreciendo misiones dinámicas y múltiples clases de personajes.")
         .release_date(LocalDate.parse("2013-10-21"))
@@ -121,7 +112,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         .categories(List.of(action, tacticalShooter, threeD))
         .build();
 
-        Game g9 = Game.builder()
+        Game g8 = Game.builder()
         .name("Apex Legends")
         .description("Un shooter táctico basado en escuadrones con héroes únicos, ambientado en el universo de Titanfall.")
         .release_date(LocalDate.parse("2019-02-04"))
@@ -130,7 +121,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         .categories(List.of(action, moba, threeD))
         .build();
 
-        Game g10 = Game.builder()
+        Game g9 = Game.builder()
         .name("Enlisted")
         .description("Un shooter táctico ambientado en la Segunda Guerra Mundial donde los jugadores controlan escuadrones de soldados en combates históricos.")
         .release_date(LocalDate.parse("2021-04-08"))
@@ -139,7 +130,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         .categories(List.of(action, threeD))
         .build();
 
-        Game g11 = Game.builder()
+        Game g10 = Game.builder()
         .name("Super Mario Odyssey")
         .description("Mario emprende una aventura en un mundo de plataformas 3D para rescatar a la princesa Peach usando su nuevo compañero, Cappy.")
         .release_date(LocalDate.parse("2017-10-27"))
@@ -148,7 +139,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         .categories(List.of(adventure, threeD, platform))
         .build();
 
-        Game g12 = Game.builder()
+        Game g11 = Game.builder()
         .name("Ori and the Blind Forest")
         .description("Un juego de plataformas que combina una hermosa narrativa con desafiantes mecánicas mientras Ori intenta salvar su bosque.")
         .release_date(LocalDate.parse("2015-03-11"))
@@ -157,7 +148,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         .categories(List.of(adventure, twoD, metroidvania))
         .build();
 
-        Game g13 = Game.builder()
+        Game g12 = Game.builder()
         .name("Celeste")
         .description("Ayuda a Madeline a escalar la montaña Celeste enfrentando desafiantes niveles de plataformas y sus propios miedos.")
         .release_date(LocalDate.parse("2018-01-25"))
@@ -166,8 +157,8 @@ public class DatabaseSeeder implements CommandLineRunner {
         .categories(List.of(adventure, twoD, metroidvania))
         .build();
 
-        Game g14 = Game.builder()
-        .name("The Witcher 3: Wild Hunt")
+        Game g13 = Game.builder()
+        .name("The Witcher 3 - Wild Hunt")
         .description("Un RPG de mundo abierto donde Geralt de Rivia busca a su hija adoptiva mientras enfrenta monstruos y decisiones morales.")
         .release_date(LocalDate.parse("2015-05-19"))
         .developer("CD Projekt Red")
@@ -175,7 +166,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         .categories(List.of(action, role))
         .build();
 
-        Game g15 = Game.builder()
+        Game g14 = Game.builder()
         .name("Elden Ring")
         .description("Un juego de rol de acción ambientado en un mundo abierto, con una historia creada por Hidetaka Miyazaki y George R.R. Martin.")
         .release_date(LocalDate.parse("2022-02-25"))
@@ -184,7 +175,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         .categories(List.of(action, role, threeD))
         .build();
 
-        Game g16 = Game.builder()
+        Game g15 = Game.builder()
         .name("Final Fantasy XV")
         .description("Un juego de rol épico donde el príncipe Noctis y sus amigos intentan recuperar su reino de las fuerzas enemigas.")
         .release_date(LocalDate.parse("2016-11-29"))
@@ -193,6 +184,6 @@ public class DatabaseSeeder implements CommandLineRunner {
         .categories(List.of(action, role, threeD))
         .build();
         
-        gameDAO.saveAll(List.of(g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g13, g14, g15, g16));
+        gameDAO.saveAll(List.of(g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g13, g14, g15));
     }
 }
