@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: loudlygmz
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}?createDatabaseIfNotExist=true
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI}
+  security:
+    user:
+      password: false
+
+firebase:
+  api:
+    key: ${FIREBASE_API_KEY}
+frontend:
+  url: ${FRONTEND_URL}

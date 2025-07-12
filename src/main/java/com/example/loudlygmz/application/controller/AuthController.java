@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.loudlygmz.application.dto.auth.LoginResponse;
 import com.example.loudlygmz.application.dto.user.LoginRequestDTO;
 import com.example.loudlygmz.domain.service.IAuthService;
+import com.example.loudlygmz.infrastructure.common.AuthUtils;
 import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,5 +63,25 @@ public class AuthController {
             "Inicio de sesión exitoso",
             response));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ResponseDTO<String>> logout(HttpServletResponse response) {
+        String userLogged = AuthUtils.getCurrentUser().getUsername();
+        ResponseCookie cookie = ResponseCookie.from("session", "")
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(0) // Expira inmediatamente
+            .sameSite("None")
+            .build();
+
+        response.addHeader("Set-Cookie", cookie.toString());
+
+        return ResponseEntity.ok(ResponseDTO.success(
+            HttpStatus.OK.value(),
+            "Cerrado de sesión exitoso",
+            String.format("Sesión de %s cerrada correctamente", userLogged)));
+    }
+    
 
 }
