@@ -16,7 +16,7 @@ public interface IGameRepository extends JpaRepository<Game, Integer> {
     List<Game> findGamesByCategoryName(@Param("categoryName") String categoryName);
 
     @Query(value = "SELECT EXISTS (SELECT 1 FROM categories WHERE name = :categoryName)", nativeQuery = true)
-    int categoryExistsRaw(@Param("categoryName") String categoryName);
+    boolean categoryExistsRaw(@Param("categoryName") String categoryName);
 
     Optional<Game> findByName(String name);
 

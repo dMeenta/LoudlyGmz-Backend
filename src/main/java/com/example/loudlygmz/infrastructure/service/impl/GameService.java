@@ -53,7 +53,7 @@ public class GameService implements IGameService {
 
     @Override
     public List<GameDTO> getGamesByCategory(String categoryName) {
-        boolean categoryExists = gameRepository.categoryExistsRaw(categoryName)==1 ? true : false;
+        boolean categoryExists = gameRepository.categoryExistsRaw(categoryName);
 
         if(!categoryExists){
             throw new EntityNotFoundException(String.format("La categoría con '%s' no existe", categoryName));
