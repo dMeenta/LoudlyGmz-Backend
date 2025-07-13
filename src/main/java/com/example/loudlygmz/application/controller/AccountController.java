@@ -45,7 +45,7 @@ public class AccountController {
         UserResponse response = accountOrchestrator.registerUser(request);
         return ResponseEntity.ok(ResponseDTO.success(
             HttpStatus.CREATED.value(),
-            "Usuario registrado correctamente",
+            String.format("User registered correctly. Welcome to LoudlyGmz %s", request.getUsername()),
             response));
     }
 }

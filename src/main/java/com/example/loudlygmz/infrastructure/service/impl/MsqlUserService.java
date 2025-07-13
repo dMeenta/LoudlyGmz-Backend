@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.application.dto.user.RegisterRequestDTO;
+import com.example.loudlygmz.application.exception.DuplicateEmailException;
+import com.example.loudlygmz.application.exception.DuplicateUsernameException;
 import com.example.loudlygmz.domain.enums.Role;
 import com.example.loudlygmz.domain.model.MsqlUser;
 import com.example.loudlygmz.domain.repository.IMsqlUserRepository;
@@ -24,6 +26,14 @@ public class MsqlUserService implements IMsqlUserService {
 
     @Override
     public MsqlUser createUser(String uid, RegisterRequestDTO request) {
+        if (msqUserlRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateEmailException("This email is already taken, please use another one.");
+        }
+
+        if (msqUserlRepository.existsByUsername(request.getUsername())) {
+            throw new DuplicateUsernameException("This username is already taken, please use another one.");
+        }
+
         MsqlUser user = new MsqlUser();
         user.setUid(uid);
         user.setEmail(request.getEmail());
@@ -34,6 +44,7 @@ public class MsqlUserService implements IMsqlUserService {
 
         user = SanitizationUtils.sanitizeUser(user);
 
+        
         return msqUserlRepository.save(user);
     }
 

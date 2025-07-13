@@ -17,6 +17,26 @@ import jakarta.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ResponseDTO<?>> handleDuplicateEmailException(DuplicateEmailException ex) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(ResponseDTO.error(
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage(),
+                null));
+    }
+
+    @ExceptionHandler(DuplicateUsernameException.class)
+    public ResponseEntity<ResponseDTO<?>> handleDuplicateEmailException(DuplicateUsernameException ex) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(ResponseDTO.error(
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage(),
+                null));
+    }
     
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ResponseDTO<Object>> handleNotFound(EntityNotFoundException ex){

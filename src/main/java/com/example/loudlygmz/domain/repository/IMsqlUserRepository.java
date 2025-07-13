@@ -18,4 +18,7 @@ public interface IMsqlUserRepository extends JpaRepository<MsqlUser, String> {
   Page<MsqlUser> findAllExcludingIds(@Param("excludedIds") List<String> excludedIds, Pageable pageable);
 
   Page<MsqlUser> findByUidIn(List<String> uids, Pageable pageable);
+
+  boolean existsByEmail(String email);
+  boolean existsByUsername(String username);
 }
