@@ -2,14 +2,21 @@ spring:
   application:
     name: loudlygmz
   datasource:
-    url: ${SPRING_DATASOURCE_URL}?createDatabaseIfNotExist=true
-    username: ${SPRING_DATASOURCE_USERNAME}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USER}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 5
+      max-lifetime: 1800000
+      auto-commit: false
   jpa:
     hibernate:
       ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI}
