@@ -10,4 +10,6 @@ public interface IPostService {
   Page<PostDTO> findByCommunityNamePage(String communityName, String usernameLogged, int offset, int limit);
   Post toggleLike(String postId, String usernameLogged);
   Page<PostDTO> getUserFeed(String usernameLogged, int offset, int limit);
+  Page<String> getLikersListByPostId(String postId, int offset, int limit);
+  Page<PostDTO> getUserPosts(String usernameLogged, String username, int offset, int limit);
 }

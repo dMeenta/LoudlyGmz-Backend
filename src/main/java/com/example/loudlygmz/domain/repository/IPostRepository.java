@@ -12,4 +12,5 @@ import com.example.loudlygmz.domain.model.Post;
 public interface IPostRepository  extends MongoRepository<Post, String> {
   Page<Post> findByCommunityName(String communityName, Pageable pageable);
   Page<Post> findByCommunityNameIn(List<String> communityName, Pageable pageable);
+  Page<Post> findByPosterUsername(String posterUsername, Pageable pageable);
 }

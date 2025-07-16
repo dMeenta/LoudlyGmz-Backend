@@ -79,6 +79,33 @@ public class PostController {
       "User feed returned!",
       response));
   }
+
+  @GetMapping("/{postId}/likes")
+  public ResponseEntity<ResponseDTO<Page<String>>> getLikersListByPostId(
+    @PathVariable String postId,
+    @RequestParam(defaultValue = "0") int offset,
+    @RequestParam(defaultValue = "10") int limit
+  ){
+    Page<String> response = postService.getLikersListByPostId(postId, offset, limit);
+    return ResponseEntity.ok(
+      ResponseDTO.success(
+      HttpStatus.OK.value(),
+      "Users who liked this post listed successfully!",
+      response));
+  }
   
+  @GetMapping("/user/{username}")
+  public ResponseEntity<ResponseDTO<Page<PostDTO>>> getUserPosts(
+    @PathVariable String username,
+    @RequestParam(defaultValue = "0") int offset,
+    @RequestParam(defaultValue = "5") int limit) {
+      String usernameLogged = AuthUtils.getCurrentUser().getUsername();
+      Page<PostDTO> response = postService.getUserPosts(usernameLogged, username, offset, limit);
+      return ResponseEntity.ok(
+        ResponseDTO.success(
+        HttpStatus.OK.value(),
+        String.format("%s's posts were listed successfully!", username),
+        response));
+  }
 
 }
