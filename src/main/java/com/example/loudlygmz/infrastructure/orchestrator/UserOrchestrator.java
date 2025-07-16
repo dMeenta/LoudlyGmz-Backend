@@ -66,17 +66,17 @@ public class UserOrchestrator {
             msqlUser.getCreationDate());
     }
 
-    public UserWithRelationshipDTO getUserByUsername(String userLogged, String usernameSearched){
-        MsqlUser userSearched = msqlUserService.getMsqlUserByUsername(usernameSearched);
-        String responseUsername = userSearched.getUsername();
-        String searchedUserProfilePicture = userSearched.getProfilePicture();
-        String searchedUserId = userSearched.getUid();
+    public Page<UserWithRelationshipDTO> searchUsersByUsername(String userLogged, String usernameQuery, int offset, int limit) {
         MongoUser currentUser = mongoUserService.getUserByUsername(userLogged);
-
-        return new UserWithRelationshipDTO(
-                responseUsername,
-                searchedUserProfilePicture,
-                getRelationshipStatus(searchedUserId, currentUser));
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+    
+        Page<MsqlUser> usersPage = msqlUserService.searchUsersByUsernameContaining(usernameQuery, pageable);
+    
+        return usersPage.map(user ->
+            new UserWithRelationshipDTO(
+                user.getUsername(),
+                user.getProfilePicture(),
+                getRelationshipStatus(user.getUid(), currentUser)));
     }
 
     public UserResponse getUserByUid(String uid){
@@ -122,6 +122,26 @@ public class UserOrchestrator {
         return new PageImpl<>(friends, pageable, usersPage.getTotalElements());
     }
 
+    public Page<UserWithRelationshipDTO> getUserFriendsList(String usernameLogged, String usernameTarget, int offset, int limit) {
+        MongoUser userTarget = mongoUserService.getUserByUsername(usernameTarget);
+        MongoUser userLogged = mongoUserService.getUserByUsername(usernameLogged);
+
+        List<String> userIds = userTarget.getFriendsList()
+            .stream().map(f -> f.friendUid()).toList();
+
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+
+        Page<MsqlUser> usersPage = msqlUserService.findUsersByIdIn(userIds, pageable);
+
+        return usersPage.map(user->{
+            String targetUserId = user.getUid();
+            return new UserWithRelationshipDTO(
+                user.getUsername(),
+                user.getProfilePicture(),
+                getRelationshipStatus(targetUserId, userLogged));
+        });
+    }
+
     public Page<UserWithRelationshipDTO> getUsersExcludingCurrentAndFriends(String usernameLogged, int offset, int limit) {
         MongoUser userLogged = mongoUserService.getUserByUsername(usernameLogged);
 
@@ -156,7 +176,7 @@ public class UserOrchestrator {
             status = FriendshipStatus.PENDING_SENT;
         } else if (receivedRequests.contains(targetUserId)) {
             status = FriendshipStatus.PENDING_RECEIVED;
-        } else if (friendUids.contains(targetUserId)){
+        } else if (friendUids.contains(targetUserId) || targetUserId.equals(currentUser.getId())){
             status = FriendshipStatus.FRIENDS;
         } else {
             status = FriendshipStatus.NONE;

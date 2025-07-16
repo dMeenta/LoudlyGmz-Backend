@@ -46,15 +46,17 @@ public class UserController {
     }
 
     @GetMapping("/user/{usernameSearched}")
-    public ResponseEntity<ResponseDTO<UserWithRelationshipDTO>> getUserByUsername(@PathVariable @Valid
-    @Size(min = 5, max = 30, message = "The length of the username should be between 5 and 30")
+    public ResponseEntity<ResponseDTO<Page<UserWithRelationshipDTO>>> getUserByUsername(@PathVariable @Valid
     @Pattern(regexp = "^[^\\s]+$", message = "Username must not contain spaces")
     @NotBlank(message = "A username is needed to search into LoudlyGmz")
-    String usernameSearched) {
+    String usernameSearched,
+    @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int limit) {
         String currentUser = AuthUtils.getCurrentUser().getUsername();
-        UserWithRelationshipDTO user = userOrchestrator.getUserByUsername(currentUser, usernameSearched);
+        Page<UserWithRelationshipDTO> response = userOrchestrator.searchUsersByUsername(currentUser, usernameSearched, offset, limit);
         return ResponseEntity.ok(
-            ResponseDTO.success(HttpStatus.OK.value(), "Usuario encontrado", user));
+            ResponseDTO.success(HttpStatus.OK.value(),
+            String.format("Users that match with %s were listed", usernameSearched),
+            response));
     }
 
     @GetMapping()
@@ -97,6 +99,18 @@ public class UserController {
         return ResponseEntity.ok(
         ResponseDTO.success(HttpStatus.OK.value(),
         "Friendship requests listed.",
+        page));
+    }
+
+    @GetMapping("/{username}/friends")
+    public ResponseEntity<ResponseDTO<Page<UserWithRelationshipDTO>>> getFriendRequests(
+        @PathVariable String username,
+        @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int limit) {
+        String userLogged = AuthUtils.getCurrentUser().getUsername();
+        Page<UserWithRelationshipDTO> page = userOrchestrator.getUserFriendsList(userLogged, username, offset, limit);
+        return ResponseEntity.ok(
+        ResponseDTO.success(HttpStatus.OK.value(),
+        String.format("Friends of user %s listed successfully.", username),
         page));
     }
 

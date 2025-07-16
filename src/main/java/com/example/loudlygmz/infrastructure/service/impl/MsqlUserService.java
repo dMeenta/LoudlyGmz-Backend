@@ -77,4 +77,10 @@ public class MsqlUserService implements IMsqlUserService {
     public Page<MsqlUser> findUsersByIdIn(List<String> listOfUids, Pageable pageable) {
         return msqUserlRepository.findByUidIn(listOfUids, pageable);
     }    
+
+    @Override
+    public Page<MsqlUser> searchUsersByUsernameContaining(String username, Pageable pageable) {
+        return msqUserlRepository.findByUsernameContainingIgnoreCase(username, pageable);
+    }
+
 }
