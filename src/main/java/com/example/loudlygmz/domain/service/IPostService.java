@@ -12,4 +12,6 @@ public interface IPostService {
   Page<PostDTO> getUserFeed(String usernameLogged, int offset, int limit);
   Page<String> getLikersListByPostId(String postId, int offset, int limit);
   Page<PostDTO> getUserPosts(String usernameLogged, String username, int offset, int limit);
+  void deletePostById(String usernameLogged, String postId);
+  void editPostContent(String postId, String usernameLogged, String newContent);
 }

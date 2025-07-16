@@ -16,11 +16,12 @@ import com.example.loudlygmz.infrastructure.common.AuthUtils;
 import com.example.loudlygmz.infrastructure.common.ResponseDTO;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController
 @RequestMapping("/api/posts")
@@ -41,18 +42,18 @@ public class PostController {
         response));
       }
       
-      @GetMapping("/{communityName}")
-      public ResponseEntity<ResponseDTO<Page<PostDTO>>> findPostsByCommunityName(
-        @PathVariable String communityName,
-        @RequestParam(defaultValue = "0") int offset,
-        @RequestParam(defaultValue = "5") int limit) {
-          String usernameLogged = AuthUtils.getCurrentUser().getUsername();
-          Page<PostDTO> response = postService.findByCommunityNamePage(communityName, usernameLogged, offset, limit);
-          return ResponseEntity.ok(
-            ResponseDTO.success(
-            HttpStatus.OK.value(),
-            String.format("Posts listed from %s to %s!", offset, limit),
-            response));
+  @GetMapping("/{communityName}")
+  public ResponseEntity<ResponseDTO<Page<PostDTO>>> findPostsByCommunityName(
+    @PathVariable String communityName,
+    @RequestParam(defaultValue = "0") int offset,
+    @RequestParam(defaultValue = "5") int limit) {
+      String usernameLogged = AuthUtils.getCurrentUser().getUsername();
+      Page<PostDTO> response = postService.findByCommunityNamePage(communityName, usernameLogged, offset, limit);
+      return ResponseEntity.ok(
+        ResponseDTO.success(
+        HttpStatus.OK.value(),
+        String.format("Posts listed from %s to %s!", offset, limit),
+        response));
   }
 
   @PatchMapping("/{postId}/toggle-like")
@@ -106,6 +107,28 @@ public class PostController {
         HttpStatus.OK.value(),
         String.format("%s's posts were listed successfully!", username),
         response));
+  }
+  
+  @DeleteMapping("/{postId}")
+  public ResponseEntity<ResponseDTO<String>> deletePostById(@PathVariable String postId) {
+    String usernameRequester = AuthUtils.getCurrentUser().getUsername();
+    postService.deletePostById(usernameRequester, postId);
+      return ResponseEntity.ok(
+        ResponseDTO.success(
+        HttpStatus.OK.value(),
+        "Post deleted successfully",
+        null));
+  }
+
+  @PatchMapping("/{postId}/edit-content")
+  public ResponseEntity<ResponseDTO<Post>> editPostContent(@PathVariable String postId, @RequestBody String newContent){
+    String usernameLogged = AuthUtils.getCurrentUser().getUsername();
+    postService.editPostContent(postId, usernameLogged, newContent);
+    return ResponseEntity.ok(
+      ResponseDTO.success(
+      HttpStatus.OK.value(),
+      "Content of the post updated!",
+      null));
   }
 
 }

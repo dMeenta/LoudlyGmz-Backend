@@ -16,7 +16,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.example.loudlygmz.application.dto.PostDTO;
+import com.example.loudlygmz.application.exception.UnauthorizedException;
 import com.example.loudlygmz.domain.model.Post;
+import com.example.loudlygmz.domain.repository.ICommentRepository;
 import com.example.loudlygmz.domain.repository.IPostRepository;
 import com.example.loudlygmz.domain.service.IPostService;
 import com.example.loudlygmz.infrastructure.common.OwnerUtils;
@@ -30,6 +32,7 @@ import lombok.AllArgsConstructor;
 public class PostService implements IPostService {
 
   private final IPostRepository postRepository;
+  private final ICommentRepository commentRepository;
   private final CommunityOrchestrator communityOrchestrator;
   private final MongoTemplate mongoTemplate;
 
@@ -167,4 +170,34 @@ public class PostService implements IPostService {
       return new PageImpl<>(postDTOs, pageable, postsPage.getTotalElements());
   }
 
+  @Override
+  public void deletePostById(String usernameLogged, String postId) {
+    Post post = postRepository.findById(postId)
+      .orElseThrow(() -> new EntityNotFoundException(
+        String.format("Post with ID: %s doesn't exist", postId)));
+
+    if (!post.getPosterUsername().equals(usernameLogged)) {
+      throw new UnauthorizedException(String.format(
+        "You are not the owner of the post with ID: '%s'. You are not allowed to delete it.", postId));
+    }
+
+    postRepository.deleteById(postId);
+    commentRepository.deleteAllByPostId(postId);
+  }
+
+  @Override
+  public void editPostContent(String postId, String usernameLogged, String newContent) {
+    Post postToEdit = postRepository.findById(postId).orElseThrow(()->
+      new EntityNotFoundException(String.format("Post with ID: %s doesn't exist", postId))
+    );
+
+    if(!postToEdit.getPosterUsername().equals(usernameLogged)){
+      throw new UnauthorizedException(String.format("You are not the owner of the post with ID: '%s'. You are not allowed to delete it.", postId));
+    }
+
+    postToEdit.setContent(newContent);
+    
+    postRepository.save(postToEdit);
+  }
+  
 }
