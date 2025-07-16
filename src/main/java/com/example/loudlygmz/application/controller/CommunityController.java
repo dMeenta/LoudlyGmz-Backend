@@ -73,11 +73,25 @@ public class CommunityController {
     }
 
     @GetMapping("/userLogged")
-    public ResponseEntity<ResponseDTO<Page<UserCommunityDTO>>> getUserGameCommunities(
+    public ResponseEntity<ResponseDTO<Page<UserCommunityDTO>>> getCurrentUserCommunities(
         @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue="10") int limit
     ) {
         String userLogged = AuthUtils.getCurrentUser().getUsername();
         Page<UserCommunityDTO> response = communityOrchestrator.getUserLoggedCommunities(userLogged, offset, limit);
+        return ResponseEntity.ok(
+            ResponseDTO.success(
+                HttpStatus.OK.value(),
+                "User communities listed",
+                response));
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<ResponseDTO<Page<UserCommunityDTO>>> getUserCommunities(
+        @PathVariable String username,
+        @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue="10") int limit
+    ) {
+        String userLogged = AuthUtils.getCurrentUser().getUsername();
+        Page<UserCommunityDTO> response = communityOrchestrator.getUserLoggedCommunities(username, offset, limit);
         return ResponseEntity.ok(
             ResponseDTO.success(
                 HttpStatus.OK.value(),
