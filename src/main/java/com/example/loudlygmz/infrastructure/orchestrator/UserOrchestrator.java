@@ -198,4 +198,21 @@ public class UserOrchestrator {
 
         return new PageImpl<>(users, pageable, usersPage.getTotalElements());
     }
+
+    public Page<FriendResponseDTO> searchUserInFriendsList(String currentUser, String usernameSearched, int offset, int limit) {
+        MongoUser userLogged = mongoUserService.getUserByUsername(currentUser);
+        List<String> userIds = userLogged.getFriendsList()
+            .stream().map(f -> f.friendUid()).toList();
+
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+
+        Page<MsqlUser> usersPage = msqlUserService.findUsersByUidInAndUsername(userIds, usernameSearched, pageable);
+
+        List<FriendResponseDTO> friends = usersPage.getContent().stream()
+            .map(user -> new FriendResponseDTO(user.getUsername(), user.getProfilePicture()))
+            .toList();
+
+        return new PageImpl<>(friends, pageable, usersPage.getTotalElements());
+    }
+
 }

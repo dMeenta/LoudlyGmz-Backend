@@ -114,4 +114,19 @@ public class UserController {
         page));
     }
 
+    @GetMapping("/friends/{usernameSearched}")
+    public ResponseEntity<ResponseDTO<Page<FriendResponseDTO>>> searchUserInFriendsList(@PathVariable @Valid
+    @Pattern(regexp = "^[^\\s]+$", message = "Username must not contain spaces")
+    @NotBlank(message = "A username is needed to search into LoudlyGmz")
+    String usernameSearched,
+    @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "8") int limit) {
+        String currentUser = AuthUtils.getCurrentUser().getUsername();
+        Page<FriendResponseDTO> response = userOrchestrator.searchUserInFriendsList(currentUser, usernameSearched, offset, limit);
+        return ResponseEntity.ok(
+            ResponseDTO.success(HttpStatus.OK.value(),
+            String.format("Users that match with %s in the friend list returned.", usernameSearched),
+            response));
+    }
+    
+
 }

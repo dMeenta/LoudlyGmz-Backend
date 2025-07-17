@@ -16,4 +16,5 @@ public interface IMsqlUserService {
     Page<MsqlUser> findUsersByIdIn(List<String> listOfUids, Pageable pageable);
     Page<MsqlUser> findAllExcludingIds(List<String> excludedIds, Pageable pageable);
     Page<MsqlUser> searchUsersByUsernameContaining(String query, Pageable pageable);
+    Page<MsqlUser> findUsersByUidInAndUsername(List<String> ids, String username, Pageable pageable);
 }

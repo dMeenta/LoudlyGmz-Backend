@@ -22,4 +22,5 @@ public interface IMsqlUserRepository extends JpaRepository<MsqlUser, String> {
   boolean existsByEmail(String email);
   boolean existsByUsername(String username);
   Page<MsqlUser> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
+  Page<MsqlUser> findByUidInAndUsernameContainingIgnoreCase(List<String> ids, String username, Pageable pageable);
 }
